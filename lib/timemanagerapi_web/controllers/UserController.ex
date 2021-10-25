@@ -1,21 +1,82 @@
 defmodule TimeManagerAPIWeb.UsersController do
   use TimeManagerAPIWeb, :controller
+  import Ecto.Query
+  require Logger
 
   @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
   def show(conn, %{"userID" => userID} = _) do
-    send_resp(conn, 200, "Show: " <> userID)
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Users,
+          where: u.id == ^userID,
+          select: [:id, :username, :email],
+          limit: 1
+      )
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "User not found")
+    else
+      myfirst = Enum.at(query, 0)
+
+      json(conn, %{
+        id: Map.fetch!(myfirst, :id),
+        username: Map.fetch!(myfirst, :username),
+        email: Map.fetch!(myfirst, :email)
+      })
+    end
   end
 
   def show(conn, %{"email" => email, "username" => username} = _) do
-    send_resp(conn, 200, "Show: " <> email <> " " <> username)
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Users,
+          where: u.email == ^email and u.username == ^username,
+          select: [:id, :username, :email],
+          limit: 1
+      )
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "User not found")
+    else
+      myfirst = Enum.at(query, 0)
+
+      json(conn, %{
+        id: Map.fetch!(myfirst, :id),
+        username: Map.fetch!(myfirst, :username),
+        email: Map.fetch!(myfirst, :email)
+      })
+    end
   end
 
   def show(conn, _params \\ :default) do
-    send_resp(conn, 400, "Bad request: no id nor username/password combo")
+    send_resp(conn, 400, "Bad request: no id nor username/email combo")
   end
 
-  def create(conn, _params) do
-    send_resp(conn, 500, "Create")
+  def create(conn, %{"email" => email, "username" => username} = _) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Users,
+          where: u.email == ^email and u.username == ^username,
+          select: u
+      )
+
+    if(!Enum.empty?(query)) do
+      send_resp(conn, 400, "User has duplicate username or password")
+    else
+      toInsert = %{username: username, email: email}
+      changeSet = TimeManagerAPI.Users.changeset(%TimeManagerAPI.Users{}, toInsert)
+
+      if !Enum.empty?(changeSet.errors) do
+        send_resp(conn, 400, "Invalid email format")
+      else
+        TimeManagerAPI.Repo.insert(changeSet)
+        send_resp(conn, 200, "Created user " <> username)
+      end
+    end
+  end
+
+  def create(conn, _ \\ :default) do
+    send_resp(conn, 400, "No username and/or no email")
   end
 
   def update(conn, params) do
