@@ -7,6 +7,37 @@ defmodule TimeManagerAPIWeb.Router do
 
   scope "/api", TimeManagerAPIWeb do
     pipe_through :api
+
+    scope "/users" do
+      # create
+      post "/", UsersController, :create
+      # read
+      get "/", UsersController, :show
+      get "/:userID", UsersController, :show
+      # update
+      put "/:userID", UsersController, :update
+      # delete
+      delete "/:userID", UsersController, :delete
+    end
+
+    scope "/workingtimes" do
+      # create
+      post "/:userID", WorkingTimesController, :create
+      # read
+      # Get all of user
+      get "/:userID", WorkingTimesController, :show
+      # Get specific timeframe
+      get "/:id", WorkingTimesController, :show
+      # update
+      put "/:id", WorkingTimesController, :update
+      # delete
+      delete "/:id", WorkingTimesController, :delete
+    end
+
+    scope "/clocks" do
+      get "/:userID", ClocksController, :show
+      post "/:userID", ClocksController, :update
+    end
   end
 
   # Enables LiveDashboard only for development
