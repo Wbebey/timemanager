@@ -13,7 +13,7 @@ defmodule TimeManagerAPI.Clocks do
   @doc false
   def changeset(clocks, attrs) do
     clocks
-    |> cast(attrs, [:time, :status])
-    |> validate_required([:time, :status])
+    |> cast(attrs, [:time, :status, :user])
+    |> validate_required([:time, :status, :user])
   end
 end
