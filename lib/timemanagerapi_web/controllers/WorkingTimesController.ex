@@ -92,7 +92,24 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     send_resp(conn, 500, "Update: " <> Kernel.inspect(params))
   end
 
-  def delete(conn, params) do
-    send_resp(conn, 500, "Delete: " <> Kernel.inspect(params))
+  def delete(conn, %{"id" => id} = _) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.WorkingTimes,
+          where: u.id == ^id,
+          select: u
+      )
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "WorkingTimes not found")
+    else
+      workingTime = Map.fetch!(Enum.at(query, 0), :id)
+      TimeManagerAPI.Repo.delete(Enum.at(query, 0))
+      send_resp(conn, 200, "Deleted WorkingTimes number " <> workingTime)
+    end
+  end
+
+  def delete(conn, _ \\ :default) do
+    send_resp(conn, 400, "Missing id")
   end
 end
