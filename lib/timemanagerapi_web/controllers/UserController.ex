@@ -99,8 +99,10 @@ defmodule TimeManagerAPIWeb.UsersController do
           send_resp(conn, 200, "Updated user " <> username)
         end
       end
+  end
 
-
+  def update(conn, _ \\ :default) do
+    send_resp(conn, 400, "Missing argument")
   end
 
   def delete(conn, params) do
