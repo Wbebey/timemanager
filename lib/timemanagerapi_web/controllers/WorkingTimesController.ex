@@ -3,44 +3,82 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   import Ecto.Query
   require Logger
 
+  def applyThrice(arguments, function) do
+    function.(Enum.at(arguments, 0), Enum.at(arguments, 1), Enum.at(arguments, 2))
+  end
+
   def createDateTime(input) do
     split = String.split(input)
-    left = String.split(split, '-')
-    right = String.split(split, ':')
-    mydate = Date.new!(Enum.at(left, 0), Enum.at(left, 1), Enum.at(left, 2))
-    mytime = Date.new!(Enum.at(right, 0), Enum.at(right, 1), Enum.at(right,2))
-    DateTime.new(mydate, mytime)
+
+    if Enum.count(split) != 2 do
+      {:error, "Invalid format"}
+    else
+      left = split |> Enum.at(0) |> String.split("-")
+      right = split |> Enum.at(1) |> String.split(":")
+
+      parse = fn x -> x |> Integer.parse() |> elem(0) end
+
+      if Enum.count(left) != 3 and Enum.count(right) != 3 do
+        {:error, "Invalid format"}
+      else
+        mydate = left |> Enum.map(parse)
+        mytime = right |> Enum.map(parse)
+
+        NaiveDateTime.new(
+          mydate |> Enum.at(0),
+          mydate |> Enum.at(1),
+          mydate |> Enum.at(2),
+          mytime |> Enum.at(0),
+          mytime |> Enum.at(1),
+          mytime |> Enum.at(2)
+        )
+      end
+    end
+  end
+
+  def dateTimeToString(d) do
+    "#{d.year}-#{d.month}-#{d.day} #{d.hour}:#{d.minute}:#{d.second}"
   end
 
   @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
   def show(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
-    start = createDateTime(start)
-    myend = createDateTime(myend)
+    {startstatus, start} = createDateTime(start)
+    {endstatus, myend} = createDateTime(myend)
 
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.WorkingTimes,
-          where: u.user == ^userID and u.start >= ^start and u.end <= ^myend,
-          select: u,
-      )
-
-    if(Enum.empty?(query)) do
-      send_resp(conn, 404, "User not found")
+    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
+      send_resp(conn, 404, "Invalid input")
     else
-      myfirst = Enum.at(query, 0)
+      query =
+        TimeManagerAPI.Repo.all(
+          from u in TimeManagerAPI.Workingtimes,
+            where: u.user == ^userID and u.start >= ^start and u.end <= ^myend,
+            select: u
+        )
 
-      json(conn, %{
-        id: Map.fetch!(myfirst, :id),
-        username: Map.fetch!(myfirst, :username),
-        email: Map.fetch!(myfirst, :email)
-      })
+      if(Enum.empty?(query)) do
+        send_resp(conn, 404, "No result found")
+      else
+        Logger.debug("ID" <> userID)
+
+        myfiltered =
+          query
+          |> Enum.map(fn x ->
+            %{
+              start: Map.fetch!(x, :start) |> dateTimeToString,
+              user: Map.fetch!(x, :user)
+            }
+            |> Map.put(:end, Map.fetch!(x, :end) |> dateTimeToString)
+          end)
+
+        json(conn, myfiltered)
+      end
     end
   end
 
-  def show(conn, %{"id" => id} = _) do
+  def show(conn, %{"userID" => id} = _) do
     query =
       TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.WorkingTimes,
+        from u in TimeManagerAPI.Workingtimes,
           where: u.id == ^id,
           select: u,
           limit: 1
@@ -51,35 +89,60 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     else
       myfirst = Enum.at(query, 0)
 
-      json(conn,
-        myfirst,
+      func = fn x ->
+        %{
+          start: Map.fetch!(x, :start) |> dateTimeToString,
+          user: Map.fetch!(x, :user)
+        }
+        |> Map.put(:end, Map.fetch!(x, :end) |> dateTimeToString)
+      end
+
+      result = func.(myfirst)
+
+      json(
+        conn,
+        result
       )
     end
   end
 
   def show(conn, _params \\ :default) do
-    send_resp(conn, 400, "Bad request: no id nor username/email combo")
+    send_resp(conn, 400, "Invalid arguments")
   end
 
-  def create(conn, %{"userID" => userID, "start" => start, "end" => end_} = _) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Users,
-          where: u.id == ^userID,
-          select: u
-      )
+  def create(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
+    {startstatus, start} = createDateTime(start)
+    {endstatus, myend} = createDateTime(myend)
 
-    if(!Enum.empty?(query)) do
-      send_resp(conn, 400, "User has duplicate username or password")
+    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
+      send_resp(conn, 404, "Invalid input")
     else
-      toInsert = %{username: username, email: email}
-      changeSet = TimeManagerAPI.Users.changeset(%TimeManagerAPI.Users{}, toInsert)
+      queryUser =
+        TimeManagerAPI.Repo.all(
+          from u in TimeManagerAPI.Users,
+            where: u.id == ^userID,
+            select: u
+        )
 
-      if !Enum.empty?(changeSet.errors) do
-        send_resp(conn, 400, "Invalid email format")
+      if(Enum.empty?(queryUser)) do
+        send_resp(conn, 404, "User not found")
       else
-        TimeManagerAPI.Repo.insert(changeSet)
-        send_resp(conn, 200, "Created user " <> username)
+        toInsert =
+          %{
+            start: start
+          }
+          |> Map.put(:end, myend)
+          |> Map.put(:user, userID)
+
+        changeSet =
+          TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, toInsert)
+
+        if !Enum.empty?(changeSet.errors) do
+          send_resp(conn, 400, "Invalid email format")
+        else
+          TimeManagerAPI.Repo.insert(changeSet)
+          send_resp(conn, 200, "Created task")
+        end
       end
     end
   end
@@ -89,25 +152,33 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def update(conn, %{"id" => id, "start" => start, "end" => myend} = _) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.WorkingTimes,
-          where: u.id == ^id,
-          select: u
-      )
+    Logger.debug("ID" <> id)
+    {startstatus, start} = createDateTime(start)
+    {endstatus, myend} = createDateTime(myend)
 
-    if(Enum.empty?(query)) do
-      send_resp(conn, 404, "WorkingTimes not found")
+    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
+      send_resp(conn, 404, "Invalid input")
     else
-      changeSet =
-        Enum.at(query, 0)
-        |> Ecto.Changeset.change(start: start, end: myend)
+      query =
+        TimeManagerAPI.Repo.all(
+          from u in TimeManagerAPI.Workingtimes,
+            where: u.id == ^id,
+            select: u
+        )
 
-      if !Enum.empty?(changeSet.errors) do
-        send_resp(conn, 400, "Invalid start or/and end format")
+      if(Enum.empty?(query)) do
+        send_resp(conn, 404, "WorkingTimes not found")
       else
-        TimeManagerAPI.Repo.update(changeSet)
-        send_resp(conn, 200, "Updated WorkingTimes number " <> id)
+        changeSet =
+          Enum.at(query, 0)
+          |> Ecto.Changeset.change(start: start, end: myend)
+
+        if !Enum.empty?(changeSet.errors) do
+          send_resp(conn, 400, "Invalid start or/and end format")
+        else
+          TimeManagerAPI.Repo.update(changeSet)
+          send_resp(conn, 200, "Updated WorkingTimes number " <> id)
+        end
       end
     end
   end
@@ -119,7 +190,7 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   def delete(conn, %{"id" => id} = _) do
     query =
       TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.WorkingTimes,
+        from u in TimeManagerAPI.Workingtimes,
           where: u.id == ^id,
           select: u
       )
@@ -127,9 +198,8 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     if(Enum.empty?(query)) do
       send_resp(conn, 404, "WorkingTimes not found")
     else
-      workingTime = Map.fetch!(Enum.at(query, 0), :id)
       TimeManagerAPI.Repo.delete(Enum.at(query, 0))
-      send_resp(conn, 200, "Deleted WorkingTimes number " <> workingTime)
+      send_resp(conn, 200, "Deleted WorkingTimes number " <> id)
     end
   end
 
