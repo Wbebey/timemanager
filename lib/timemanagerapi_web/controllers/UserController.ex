@@ -86,23 +86,17 @@ defmodule TimeManagerAPIWeb.UsersController do
           where: u.id == ^userID,
           select: u
       )
-      if(!Enum.empty?(query)) do
-        send_resp(conn, 400, "User has duplicate username or password")
+      if(Enum.empty?(query)) do
+        send_resp(conn, 404, "User not found")
       else
-        Repo.transaction(fn ->
-          user =
-            Users
-            |> where(id: userID)
-            |> lock("FOR UPDATE")
-            |> Repo.one()
-
-          changeset = Ecto.Changeset.change user, username: username, email: email
-        end)
+        changeSet =
+          Enum.at(query, 0)
+          |> Ecto.Changeset.change(username: username, email: email)
         if !Enum.empty?(changeSet.errors) do
           send_resp(conn, 400, "Invalid email format")
         else
-          TimeManagerAPI.Repo.update(changeset)
-          send_resp(conn, 200, "Created user " <> username)
+          TimeManagerAPI.Repo.update(changeSet)
+          send_resp(conn, 200, "Updated user " <> username)
         end
       end
 
