@@ -3,14 +3,25 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   import Ecto.Query
   require Logger
 
+  def createDateTime(input) do
+    split = String.split(input)
+    left = String.split(split, '-')
+    right = String.split(split, ':')
+    mydate = Date.new!(Enum.at(left, 0), Enum.at(left, 1), Enum.at(left, 2))
+    mytime = Date.new!(Enum.at(right, 0), Enum.at(right, 1), Enum.at(right,2))
+    DateTime.new(mydate, mytime)
+  end
+
   @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
-  def show(conn, %{"userID" => userID} = _) do
+  def show(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
+    start = createDateTime(start)
+    myend = createDateTime(myend)
+
     query =
       TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Users,
-          where: u.id == ^userID,
-          select: [:user],
-          limit: 1
+        from u in TimeManagerAPI.WorkingTimes,
+          where: u.user == ^userID and u.start >= ^start and u.end <= ^myend,
+          select: u,
       )
 
     if(Enum.empty?(query)) do
@@ -29,20 +40,20 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   def show(conn, %{"id" => id} = _) do
     query =
       TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Users,
+        from u in TimeManagerAPI.WorkingTimes,
           where: u.id == ^id,
-          select: [:id],
+          select: u,
           limit: 1
       )
 
     if(Enum.empty?(query)) do
-      send_resp(conn, 404, "Id WorkingTimes not found")
+      send_resp(conn, 404, "WorkingTimes not found")
     else
       myfirst = Enum.at(query, 0)
 
-      json(conn, %{
-        id: Map.fetch!(myfirst, :id),
-      })
+      json(conn,
+        myfirst,
+      )
     end
   end
 
@@ -50,11 +61,11 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     send_resp(conn, 400, "Bad request: no id nor username/email combo")
   end
 
-  def create(conn, %{"email" => email, "username" => username} = _) do
+  def create(conn, %{"userID" => userID, "start" => start, "end" => end_} = _) do
     query =
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
-          where: u.email == ^email and u.username == ^username,
+          where: u.id == ^userID,
           select: u
       )
 
@@ -74,7 +85,7 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def create(conn, _ \\ :default) do
-    send_resp(conn, 400, "No username and/or no email")
+    send_resp(conn, 400, "Invalide argument")
   end
 
   def update(conn, params) do
