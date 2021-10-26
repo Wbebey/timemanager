@@ -79,8 +79,34 @@ defmodule TimeManagerAPIWeb.UsersController do
     send_resp(conn, 400, "No username and/or no email")
   end
 
-  def update(conn, params) do
-    send_resp(conn, 500, "Update: " <> Kernel.inspect(params))
+  def update(conn, %{"userID" => userID, "username" => username, "email" => email} = _) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Users,
+          where: u.id == ^userID,
+          select: u
+      )
+      if(!Enum.empty?(query)) do
+        send_resp(conn, 400, "User has duplicate username or password")
+      else
+        Repo.transaction(fn ->
+          user =
+            Users
+            |> where(id: userID)
+            |> lock("FOR UPDATE")
+            |> Repo.one()
+
+          changeset = Ecto.Changeset.change user, username: username, email: email
+        end)
+        if !Enum.empty?(changeSet.errors) do
+          send_resp(conn, 400, "Invalid email format")
+        else
+          TimeManagerAPI.Repo.update(changeset)
+          send_resp(conn, 200, "Created user " <> username)
+        end
+      end
+
+
   end
 
   def delete(conn, params) do
