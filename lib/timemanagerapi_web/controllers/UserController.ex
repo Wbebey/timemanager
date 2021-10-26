@@ -86,19 +86,21 @@ defmodule TimeManagerAPIWeb.UsersController do
           where: u.id == ^userID,
           select: u
       )
-      if(Enum.empty?(query)) do
-        send_resp(conn, 404, "User not found")
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "User not found")
+    else
+      changeSet =
+        Enum.at(query, 0)
+        |> Ecto.Changeset.change(username: username, email: email)
+
+      if !Enum.empty?(changeSet.errors) do
+        send_resp(conn, 400, "Invalid email format")
       else
-        changeSet =
-          Enum.at(query, 0)
-          |> Ecto.Changeset.change(username: username, email: email)
-        if !Enum.empty?(changeSet.errors) do
-          send_resp(conn, 400, "Invalid email format")
-        else
-          TimeManagerAPI.Repo.update(changeSet)
-          send_resp(conn, 200, "Updated user " <> username)
-        end
+        TimeManagerAPI.Repo.update(changeSet)
+        send_resp(conn, 200, "Updated user " <> username)
       end
+    end
   end
 
   def update(conn, _ \\ :default) do
@@ -112,12 +114,17 @@ defmodule TimeManagerAPIWeb.UsersController do
           where: u.id == ^userID,
           select: u
       )
-      if(Enum.empty?(query)) do
-        send_resp(conn, 404, "User not found")
-      else
-        TimeManagerAPI.Repo.delete(userID)
-        send_resp(conn, 200, "Deleted user " <> username)
-        end
-      end
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "User not found")
+    else
+      username = Map.fetch!(Enum.at(query, 0), :username)
+      TimeManagerAPI.Repo.delete(Enum.at(query, 0))
+      send_resp(conn, 200, "Deleted user " <> username)
+    end
+  end
+
+  def delete(conn, _ \\ :default) do
+    send_resp(conn, 400, "Missing id")
   end
 end
