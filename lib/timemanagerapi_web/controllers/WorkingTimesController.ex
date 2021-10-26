@@ -88,8 +88,32 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     send_resp(conn, 400, "Invalide argument")
   end
 
-  def update(conn, params) do
-    send_resp(conn, 500, "Update: " <> Kernel.inspect(params))
+  def update(conn, %{"id" => id, "start" => start, "end" => myend} = _) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.WorkingTimes,
+          where: u.id == ^id,
+          select: u
+      )
+
+    if(Enum.empty?(query)) do
+      send_resp(conn, 404, "WorkingTimes not found")
+    else
+      changeSet =
+        Enum.at(query, 0)
+        |> Ecto.Changeset.change(start: start, end: myend)
+
+      if !Enum.empty?(changeSet.errors) do
+        send_resp(conn, 400, "Invalid start or/and end format")
+      else
+        TimeManagerAPI.Repo.update(changeSet)
+        send_resp(conn, 200, "Updated WorkingTimes number " <> id)
+      end
+    end
+  end
+
+  def update(conn, _ \\ :default) do
+    send_resp(conn, 400, "Missing argument")
   end
 
   def delete(conn, %{"id" => id} = _) do
