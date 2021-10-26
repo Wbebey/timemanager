@@ -105,7 +105,19 @@ defmodule TimeManagerAPIWeb.UsersController do
     send_resp(conn, 400, "Missing argument")
   end
 
-  def delete(conn, params) do
-    send_resp(conn, 500, "Delete: " <> Kernel.inspect(params))
+  def delete(conn, %{"userID" => userID} = _) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Users,
+          where: u.id == ^userID,
+          select: u
+      )
+      if(Enum.empty?(query)) do
+        send_resp(conn, 404, "User not found")
+      else
+        TimeManagerAPI.Repo.delete(userID)
+        send_resp(conn, 200, "Deleted user " <> username)
+        end
+      end
   end
 end
