@@ -32,3 +32,5 @@ timemanagerapi-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# frontend
+frontend/node_modules
