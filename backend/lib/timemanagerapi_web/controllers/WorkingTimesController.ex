@@ -206,4 +206,8 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   def delete(conn, _ \\ :default) do
     send_resp(conn, 400, "Missing id")
   end
+
+  def options(conn, _) do
+    send_resp(conn, 200, "Access-Control-Allow-Origin: *")
+  end
 end

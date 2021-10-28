@@ -108,4 +108,8 @@ defmodule TimeManagerAPIWeb.ClocksController do
       send_resp(conn, code, message)
     end
   end
+
+  def options(conn, _) do
+    send_resp(conn, 200, "Access-Control-Allow-Origin: *")
+  end
 end

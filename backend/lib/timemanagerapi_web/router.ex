@@ -3,7 +3,7 @@ defmodule TimeManagerAPIWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(CORSPlug)
+    plug(CORSPlug, origin: ["*"])
   end
 
   scope "/api", TimeManagerAPIWeb do
@@ -19,6 +19,7 @@ defmodule TimeManagerAPIWeb.Router do
       put("/:userID", UsersController, :update)
       # delete
       delete("/:userID", UsersController, :delete)
+      options("/", UsersController, :options)
     end
 
     scope "/workingtimes" do
@@ -33,11 +34,13 @@ defmodule TimeManagerAPIWeb.Router do
       put("/:id", WorkingTimesController, :update)
       # delete
       delete("/:id", WorkingTimesController, :delete)
+      options("/", WorkingTimeController, :options)
     end
 
     scope "/clocks" do
       get("/:userID", ClocksController, :show)
       post("/:userID", ClocksController, :update)
+      options("/", ClocksController, :options)
     end
   end
 
