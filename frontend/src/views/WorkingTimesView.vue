@@ -1,19 +1,22 @@
 <template>
   <div>
-      <p>WorkingTime View !</p>
-      <working-times />
+    <p>WorkingTime View !</p>
+    <working-times />
+    <ShowUserWorkingTime />
   </div>
 </template>
 
 <script>
-import WorkingTimes from '../components/WorkingTimes.vue'
+import WorkingTimes from "../components/WorkingTimes.vue";
+import ShowUserWorkingTime from "../components/WorkingTime/ShowUserWorkingTime.vue";
 
 export default {
-  name: 'WorkingTimesView',
+  name: "WorkingTimesView",
   components: {
     WorkingTimes,
-  }
-}
+    ShowUserWorkingTime,
+  },
+};
 </script>
 
 <style scoped>
