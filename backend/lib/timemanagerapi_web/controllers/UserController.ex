@@ -129,6 +129,7 @@ defmodule TimeManagerAPIWeb.UsersController do
   end
 
   def options(conn, _) do
-    send_resp(conn, 200, "Access-Control-Allow-Origin: *")
+    message = "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"
+    send_resp(conn, 200, message)
   end
 end

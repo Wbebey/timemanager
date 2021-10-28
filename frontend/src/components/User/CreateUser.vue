@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-card bg-variant="dark" text-variant="white">
+    <b-card bg-variant="dark" text-variant="white" title="Create User">
       <b-card-text>
         <input v-model="email" placeholder="Entrer l'email" /> <br />
         <input v-model="username" placeholder="Entrer le nom d'utilisateur" />
@@ -18,28 +18,23 @@ export default {
   name: "CreateUser",
   data() {
     return {
-      info: null,
       username: null,
       email: null,
     };
   },
   methods: {
     createUser() {
-      console.log(this.email);
-      console.log(this.username);
       axios
         .post("http://localhost:4000/api/users/", {
           email: this.email,
           username: this.username,
         })
         .then((response) => {
-          this.info = response.data;
-          console.log(this.info);
-          this.$router.push("/user/" + this.info.userID);
+          console.log(response.data);
+          this.$router.push("/user/" + response.data.id);
         })
         .catch((error) => {
           console.log("Error", error.message);
-          this.info = null;
         });
     },
   },

@@ -1,6 +1,12 @@
 <template>
   <div>
-      <p>Delete User Component !</p>
+      <b-card bg-variant="dark" text-variant="white" title="Delete User">
+      <b-card-text>
+        <input v-model="userID" placeholder="Entrer l'id" /> <br />
+        <br />
+        <button v-on:click="deleteUser()">Delete user</button>
+      </b-card-text>
+    </b-card>
   </div>
 </template>
 
@@ -11,7 +17,6 @@ export default {
   name: 'DeleteUser',
   data() {
     return {
-        info: null,
         userID: null,
     };
   },
@@ -21,7 +26,9 @@ export default {
         .delete(
           "http://localhost:4000/api/users/" + this.userID
         )
-        .then((response) => (this.info = response.data))
+        .then((response) => {
+          console.log(response.data);
+        })
         .catch((error) => { console.log('Error', error.message); this.info = null;
         });
     },
