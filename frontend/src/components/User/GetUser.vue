@@ -1,6 +1,6 @@
 <template>
   <div>
-      <p>Get User Component !</p>
+      {{getUser()}}
   </div>
 </template>
 

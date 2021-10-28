@@ -25,15 +25,6 @@ export default {
         .catch((error) => { console.log('Error', error.message); this.info = null;
         });
     },
-    deleteWorkingTime() {
-      axios
-        .get(
-          "http://api.openweathermap.org/data/2.5/weather?q=" + this.city + "&appid=" + this.Apikey
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
-        });
-    },
   },
 }
 </script>

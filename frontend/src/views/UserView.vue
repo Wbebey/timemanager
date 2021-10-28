@@ -10,6 +10,13 @@ import GetUser from '../components/User/GetUser.vue'
 
 export default {
   name: 'UserView',
+  data() {
+    return {
+      userId: this.$route.params.userId,
+      username: null,
+      email: null,
+    };
+  },
   components: {
     GetUser,
   }

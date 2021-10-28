@@ -1,13 +1,19 @@
 <template>
   <div>
     <p>Home View !</p>
+    <get-user />
   </div>
 </template>
 
 <script>
+import GetUser from '../components/User/GetUser.vue'
+
 export default {
-  name: "Home",
-};
+  name: 'Register',
+  components: {
+    GetUser
+  }
+}
 </script>
 
 <style scoped>
