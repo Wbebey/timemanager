@@ -2,41 +2,42 @@ defmodule TimeManagerAPIWeb.Router do
   use TimeManagerAPIWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
+    plug(CORSPlug)
   end
 
   scope "/api", TimeManagerAPIWeb do
-    pipe_through :api
+    pipe_through(:api)
 
     scope "/users" do
       # create
-      post "/", UsersController, :create
+      post("/", UsersController, :create)
       # read
-      get "/", UsersController, :show
-      get "/:userID", UsersController, :show
+      get("/", UsersController, :show)
+      get("/:userID", UsersController, :show)
       # update
-      put "/:userID", UsersController, :update
+      put("/:userID", UsersController, :update)
       # delete
-      delete "/:userID", UsersController, :delete
+      delete("/:userID", UsersController, :delete)
     end
 
     scope "/workingtimes" do
       # create
-      post "/:userID", WorkingTimesController, :create
+      post("/:userID", WorkingTimesController, :create)
       # read
       # Get all of user
-      get "/:userID", WorkingTimesController, :show
+      get("/:userID", WorkingTimesController, :show)
       # Get specific timeframe
-      get "/:id", WorkingTimesController, :show
+      get("/:id", WorkingTimesController, :show)
       # update
-      put "/:id", WorkingTimesController, :update
+      put("/:id", WorkingTimesController, :update)
       # delete
-      delete "/:id", WorkingTimesController, :delete
+      delete("/:id", WorkingTimesController, :delete)
     end
 
     scope "/clocks" do
-      get "/:userID", ClocksController, :show
-      post "/:userID", ClocksController, :update
+      get("/:userID", ClocksController, :show)
+      post("/:userID", ClocksController, :update)
     end
   end
 
@@ -51,8 +52,8 @@ defmodule TimeManagerAPIWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/" do
-      pipe_through [:fetch_session, :protect_from_forgery]
-      live_dashboard "/dashboard", metrics: TimeManagerAPIWeb.Telemetry
+      pipe_through([:fetch_session, :protect_from_forgery])
+      live_dashboard("/dashboard", metrics: TimeManagerAPIWeb.Telemetry)
     end
   end
 
@@ -62,9 +63,9 @@ defmodule TimeManagerAPIWeb.Router do
   # node running the Phoenix server.
   if Mix.env() == :dev do
     scope "/dev" do
-      pipe_through [:fetch_session, :protect_from_forgery]
+      pipe_through([:fetch_session, :protect_from_forgery])
 
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end
