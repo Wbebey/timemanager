@@ -3,6 +3,7 @@
     <p>Home View !</p>
     <create-user />
     <get-user />
+    <update-user />
     <delete-user />
   </div>
 </template>
@@ -11,13 +12,15 @@
 import CreateUser from '../components/User/CreateUser.vue'
 import GetUser from '../components/User/GetUser.vue'
 import DeleteUser from '../components/User/DeleteUser.vue'
+import UpdateUser from '../components/User/UpdateUser.vue'
 
 export default {
-  name: 'Register',
+  name: 'Home',
   components: {
     CreateUser,
     GetUser,
     DeleteUser,
+    UpdateUser,
   }
 }
 </script>

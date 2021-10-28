@@ -3,10 +3,12 @@
       <b-card
       bg-variant="dark"
       text-variant="white"
+      title="Update User"
     >
       <b-card-text>
         <input v-model="email" placeholder="Entrer l'email"> <br />
         <input v-model="username" placeholder="Entrer le nom d'utilisateur"> <br />
+        <input v-model="userID" placeholder="Entrer l'id"> <br />
         <button v-on:click="updateUser()">Update user</button>
       </b-card-text>
     </b-card>
@@ -22,20 +24,22 @@ export default {
     return {
         username: null,
         email: null,
+        userID: null,
     };
   },
   methods: {
     updateUser() {
       axios
-        .put("http://localhost:4000/api/users/", {
-          userID: this.userID,
+        .put(`http://localhost:4000/api/users/${this.userID}/`,
+        {
+          email: this.email,
+          username: this.username,
         })
         .then((response) => {
           console.log(response.data);
         })
         .catch((error) => {
           console.log("Error", error.message);
-          this.info = null;
         });
     },
   },
