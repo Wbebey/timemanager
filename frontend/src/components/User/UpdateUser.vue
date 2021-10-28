@@ -1,6 +1,6 @@
 <template>
   <div>
-      <p>ClockManager Component !</p>
+      <p>Update User Component !</p>
   </div>
 </template>
 
@@ -8,27 +8,19 @@
 import axios from "axios";
 
 export default {
-  name: 'ClockManager',
+  name: 'UpdateUser',
   data() {
     return {
-      startDateTime: null,
-      clockIn: false,
+        info: null,
+        username: null,
+        email: null,
     };
   },
   methods: {
-    clock() {
+    updateUser() {
       axios
         .get(
-          "http://localhost:4000/api/clocks/" + this.userID
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
-        });
-    },
-    refresh() {
-      axios
-        .post(
-          "http://localhost:4000/api/clocks/" + this.userID
+          "http://localhost:4000/api/users/" + this.userID + "&username=" + this.username + "&email" + this.email
         )
         .then((response) => (this.info = response.data))
         .catch((error) => { console.log('Error', error.message); this.info = null;

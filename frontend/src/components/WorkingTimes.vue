@@ -19,7 +19,7 @@ export default {
     getWorkingTimes() {
       axios
         .get(
-          "http://api.openweathermap.org/data/2.5/weather?q=" + this.city + "&appid=" + this.Apikey
+          "http://localhost:4000/api/workingtimes/" + this.userId + "?start=" + this.start + "&end=" + this.end
         )
         .then((response) => (this.info = response.data))
         .catch((error) => { console.log('Error', error.message); this.info = null;

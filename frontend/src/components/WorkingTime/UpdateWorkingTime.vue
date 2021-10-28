@@ -1,6 +1,6 @@
 <template>
   <div>
-      <p>WorkingTime Component !</p>
+      <p>Update WorkingTime Component !</p>
   </div>
 </template>
 
@@ -8,28 +8,18 @@
 import axios from "axios";
 
 export default {
-  name: 'WorkingTime',
+  name: 'UpdateWorkingTime',
   data() {
     return {
-      start: null,
-      end: null,
-      user: null,
+        info:null,
+        id: null,
     };
   },
   methods: {
-    createWorkingTime() {
-      axios
-        .get(
-          "http://api.openweathermap.org/data/2.5/weather?q=" + this.city + "&appid=" + this.Apikey
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
-        });
-    },
     updateWorkingTime() {
       axios
-        .get(
-          "http://api.openweathermap.org/data/2.5/weather?q=" + this.city + "&appid=" + this.Apikey
+        .put(
+          "http://localhost:4000/api/workingtimes/" + this.id
         )
         .then((response) => (this.info = response.data))
         .catch((error) => { console.log('Error', error.message); this.info = null;

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <p>ClockManager Component !</p>
+      <p>Delete User Component !</p>
   </div>
 </template>
 
@@ -8,27 +8,18 @@
 import axios from "axios";
 
 export default {
-  name: 'ClockManager',
+  name: 'DeleteUser',
   data() {
     return {
-      startDateTime: null,
-      clockIn: false,
+        info: null,
+        userID: null,
     };
   },
   methods: {
-    clock() {
-      axios
-        .get(
-          "http://localhost:4000/api/clocks/" + this.userID
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
-        });
-    },
-    refresh() {
-      axios
-        .post(
-          "http://localhost:4000/api/clocks/" + this.userID
+    deleteUser() {
+        axios
+        .delete(
+          "http://localhost:4000/api/users/" + this.userID
         )
         .then((response) => (this.info = response.data))
         .catch((error) => { console.log('Error', error.message); this.info = null;

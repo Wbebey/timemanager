@@ -1,6 +1,6 @@
 <template>
   <div>
-      <p>ClockManager Component !</p>
+      <p>Create WorkingTime Component !</p>
   </div>
 </template>
 
@@ -8,27 +8,19 @@
 import axios from "axios";
 
 export default {
-  name: 'ClockManager',
+  name: 'CreateWorkingTime',
   data() {
     return {
-      startDateTime: null,
-      clockIn: false,
+      info:null,
+      start: null,
+      end: null,
     };
   },
   methods: {
-    clock() {
-      axios
-        .get(
-          "http://localhost:4000/api/clocks/" + this.userID
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
-        });
-    },
-    refresh() {
+    createWorkingTime() {
       axios
         .post(
-          "http://localhost:4000/api/clocks/" + this.userID
+          "http://localhost:4000/api/workingtimes/" + this.user.userID + "?start=" + this.start + "&end=" + this.end
         )
         .then((response) => (this.info = response.data))
         .catch((error) => { console.log('Error', error.message); this.info = null;

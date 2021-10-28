@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../components/Home.vue'
-import WorkingTimes from '../components/WorkingTimes.vue'
-import WorkingTime from '../components/WorkingTime.vue'
-import ClockManager from '../components/ClockManager.vue'
-import ChartManager from '../components/ChartManager.vue'
+
+import Home from '../views/Home.vue'
+import Register from '../views/Register.vue'
+import UserView from '../views/UserView.vue'
+import WorkingTimesView from '../views/WorkingTimesView.vue'
 
 Vue.use(VueRouter)
 
@@ -15,29 +15,19 @@ const routes = [
     component: Home
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: Register
+  },
+  {
+    path: '/user/:userId',
+    name: 'UserView',
+    component: UserView
+  },
+  {
     path: '/workingTimes/:userId',
-    name: 'WorkingTimes',
-    component: WorkingTimes
-  },
-  {
-    path: '/workingTime/:userId',
-    name: 'WorkingTime',
-    component: WorkingTime
-  },
-  {
-    path: '/workingTime/:userId/:workingtimeId',
-    name: 'WorkingTime',
-    component: WorkingTime
-  },
-  {
-    path: '/clock/:username',
-    name: 'ClockManager',
-    component: ClockManager
-  },
-  {
-    path: '/chartManager/:userid',
-    name: 'ChartManager',
-    component: ChartManager
+    name: 'WorkingTimeView',
+    component: WorkingTimesView
   },
 ]
 
