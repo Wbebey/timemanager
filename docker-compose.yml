@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  database:
+    container_name: postgres_timemachine
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    image: postgres:13-alpine
+    ports:
+      - "5435:5432"
+    restart: always
+    networks:
+      - timemachine-backend
+    volumes:
+      - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
+      - "dbdata:/var/lib/postgresql/data"
+  backend:
+    build: backend/
+    container_name: backend_timemachine
+    image: backend_timemachine_image
+    environment:
+      PGUSER: ${PGUSER}
+      PGHOST: ${PGHOST}
+      PGDATABASE: ${PGDATABASE}
+      PGPASSWORD: ${PGPASSWORD}
+      PGPORT: ${PGPORT}
+    depends_on:
+      - database
+    ports:
+      - "4000:4000"
+    networks:
+      - timemachine-backend
+      - timemachine-frontend
+  frontend:
+    build: frontend/
+    container_name: frontend_timemachine
+    image: frontend_timemachine_image
+    environment:
+      BACKEND_URL: ${BACKEND_URL}
+      BACKEND_PORT: ${BACKEND_PORT}
+    depends_on:
+      - backend
+    ports:
+      - 8080:8080
+    networks:
+      - timemachine-frontend
+
+volumes:
+  dbdata:
+
+networks: 
+  timemachine-frontend: 
+  timemachine-backend:
