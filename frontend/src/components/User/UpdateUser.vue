@@ -1,17 +1,13 @@
 <template>
   <div>
-      <b-card
-      bg-variant="dark"
-      text-variant="white"
-      title="Update User"
-    >
-      <b-card-text>
-        <input v-model="email" placeholder="Entrer l'email"> <br />
-        <input v-model="username" placeholder="Entrer le nom d'utilisateur"> <br />
-        <input v-model="userID" placeholder="Entrer l'id"> <br />
-        <button v-on:click="updateUser()">Update user</button>
-      </b-card-text>
-    </b-card>
+      <v-card elevation="2" class="d-inline-flex pa-2" outlined tile>
+      <v-text-field label="Adresse mail" class="mx-auto pa-6" v-model="email" />
+      <v-text-field label="User ID" class="mx-auto pa-6" v-model="userID" />
+      <v-text-field label="Nom d'utilisateur" class="mx-auto pa-6" v-model="username" />
+      <v-btn elevation="2" outlined color="accent" v-on:click="updateUser()"
+        >Update User</v-btn
+      >
+    </v-card>
   </div>
 </template>
 

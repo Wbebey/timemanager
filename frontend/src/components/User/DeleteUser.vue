@@ -1,12 +1,11 @@
 <template>
   <div>
-      <b-card bg-variant="dark" text-variant="white" title="Delete User">
-      <b-card-text>
-        <input v-model="userID" placeholder="Entrer l'id" /> <br />
-        <br />
-        <button v-on:click="deleteUser()">Delete user</button>
-      </b-card-text>
-    </b-card>
+    <v-card elevation="2" class="d-inline-flex pa-2" outlined tile>
+      <v-text-field label="User ID" class="mx-auto pa-6" v-model="userID"></v-text-field>
+      <v-btn elevation="2" outlined color="accent" v-on:click="deleteUser()"
+        >Delete user</v-btn
+      >
+    </v-card>
   </div>
 </template>
 
