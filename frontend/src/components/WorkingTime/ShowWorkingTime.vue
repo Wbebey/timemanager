@@ -18,7 +18,7 @@
     <br />
 
     <ul v-if="this.info">
-      <li v-for="workingtime in this.info" :key="workingtime.start">
+      <li v-for="workingtime in this.info" :key="workingtime.start" @click="test(workingtime)">
         * {{ workingtime.start }} ==> {{ workingtime.end }} *
       </li>
     </ul>
@@ -40,14 +40,7 @@ export default {
     getWorkingTime() {
       axios
         .get(
-          "http://localhost:4000/api/workingtimes/" +
-            this.$route.params.userId +
-            "?start=" +
-            this.start.replace("T", " ") +
-            ":00" +
-            "&end=" +
-            this.end.replace("T", " ") +
-            ":00"
+          `http://localhost:4000/api/workingtimes/${this.$route.params.userId}?start=${this.start.replace('T', ' ')}:00&end=${this.end.replace('T', ' ')}:00`
         )
         .then((response) => (this.info = response.data))
         .catch((error) => {
@@ -55,6 +48,9 @@ export default {
           this.info = null;
         });
     },
+    test(id) {
+      console.log(id)
+    }
   },
 };
 </script>

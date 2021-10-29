@@ -1,6 +1,10 @@
 <template>
   <div>
-      <p>Delete WorkingTime Component !</p>
+    <h1>Delete WorkingTime !</h1>
+    <input v-model="id" placeholder="Entrer l'id" />
+    <button @click="deleteWorkingTime()" type="button" class="btn btn-primary">
+      Delete
+    </button>
   </div>
 </template>
 
@@ -8,25 +12,25 @@
 import axios from "axios";
 
 export default {
-  name: 'DeleteWorkingTime',
+  name: "DeleteWorkingTime",
   data() {
     return {
-        info: null,
-        id: null,
+      info: null,
+      id: null,
     };
   },
   methods: {
     deleteWorkingTime() {
       axios
-        .delete(
-          "http://localhost:4000/api/workingtimes/" + this.id
-        )
+        .delete(`http://localhost:4000/api/workingtimes/${this.id}`)
         .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
+        .catch((error) => {
+          console.log("Error", error.message);
+          this.info = null;
         });
     },
   },
-}
+};
 </script>
 
 <style scoped>
