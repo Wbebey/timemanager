@@ -1,40 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Home from '../views/Home.vue'
-import Register from '../views/Register.vue'
-import UserView from '../views/UserView.vue'
-import WorkingTimesView from '../views/WorkingTimesView.vue'
-import PathNotFoundView from '../views/PathNotFound.vue'
-
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: Register
-  },
-  {
-    path: '/user/:userId',
-    name: 'UserView',
-    component: UserView
-  },
-  {
-    path: '/workingTimes',
-    name: 'WorkingTimeView',
-    component: WorkingTimesView
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: "PathNotFoundView",
-    component: PathNotFoundView
-  },
+  { path: '/', component: () => import("../views/Home.vue") },
+  { path: '/register', component: () => import("../views/Register.vue") },
+  { path: '/user/:userId', component: () => import("../views/UserView.vue") },
+  { path: '/workingTimes', component: () => import("../views/WorkingTimesView.vue") },
+  { path: '/:pathMatch(.*)*', component: () => import("../views/PathNotFound.vue") },
 ]
 
 const router = new VueRouter({
