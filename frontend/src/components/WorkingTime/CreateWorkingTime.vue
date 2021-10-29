@@ -6,17 +6,17 @@
     <div id="start">
       <label for="start-time">Arrivée:</label>
 
-      <input type="datetime-local" id="start" />
+      <input v-model="start" type="datetime-local" id="start" />
     </div>
     <br />
     <div id="end">
       <label for="endtime">Départ:</label>
 
-      <input type="datetime-local" id="end" />
+      <input v-model="end" type="datetime-local" id="end" />
     </div>
     <br />
     <div id="confirm-button">
-      <button type="button" class="btn btn-primary">Confirmer</button>
+      <button @click= "createWorkingTime()" type="button" class="btn btn-primary">Confirmer</button>
     </div>
   </div>
 </template>
@@ -38,11 +38,11 @@ export default {
       axios
         .post(
           "http://localhost:4000/api/workingtimes/" +
-            this.user.userID +
+            this.$route.params.userId +
             "?start=" +
-            this.start +
+            this.start.replace('T', ' ') + ":00" +
             "&end=" +
-            this.end
+            this.end.replace('T', ' ') + ":00"
         )
         .then((response) => (this.info = response.data))
         .catch((error) => {

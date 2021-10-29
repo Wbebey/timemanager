@@ -34,7 +34,7 @@ defmodule TimeManagerAPIWeb.Router do
       put("/:id", WorkingTimesController, :update)
       # delete
       delete("/:id", WorkingTimesController, :delete)
-      options("/", WorkingTimeController, :options)
+      options("/", WorkingTimesController, :options)
     end
 
     scope "/clocks" do

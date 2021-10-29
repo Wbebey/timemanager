@@ -1,14 +1,28 @@
 <template>
   <div>
       <p>WorkingTimes Component !</p>
+      <create-working-times />
+      <show-working-times />
+      <update-working-times />
+      <delete-working-times />
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import CreateWorkingTimes from './WorkingTime/CreateWorkingTime.vue'
+import ShowWorkingTimes from './WorkingTime/ShowWorkingTime.vue'
+import UpdateWorkingTimes from './WorkingTime/UpdateWorkingTime.vue'
+import DeleteWorkingTimes from './WorkingTime/DeleteWorkingTime.vue'
 
 export default {
   name: 'WorkingTimes',
+  components: {
+    CreateWorkingTimes,
+    ShowWorkingTimes,
+    UpdateWorkingTimes,
+    DeleteWorkingTimes
+  },
   data() {
     return {
       userId: null,
