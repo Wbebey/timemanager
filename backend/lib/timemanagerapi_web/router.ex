@@ -20,6 +20,7 @@ defmodule TimeManagerAPIWeb.Router do
       # delete
       delete("/:userID", UsersController, :delete)
       options("/", UsersController, :options)
+      options("/:userID", UsersController, :options)
     end
 
     scope "/workingtimes" do
@@ -35,12 +36,14 @@ defmodule TimeManagerAPIWeb.Router do
       # delete
       delete("/:id", WorkingTimesController, :delete)
       options("/", WorkingTimesController, :options)
+      options("/:userID", WorkingTimesController, :options)
     end
 
     scope "/clocks" do
       get("/:userID", ClocksController, :show)
       post("/:userID", ClocksController, :update)
       options("/", ClocksController, :options)
+      options("/:userID", ClocksController, :options)
     end
   end
 

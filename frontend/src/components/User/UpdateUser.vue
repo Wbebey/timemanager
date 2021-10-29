@@ -1,6 +1,17 @@
 <template>
   <div>
-      <p>Update User Component !</p>
+      <b-card
+      bg-variant="dark"
+      text-variant="white"
+      title="Update User"
+    >
+      <b-card-text>
+        <input v-model="email" placeholder="Entrer l'email"> <br />
+        <input v-model="username" placeholder="Entrer le nom d'utilisateur"> <br />
+        <input v-model="userID" placeholder="Entrer l'id"> <br />
+        <button v-on:click="updateUser()">Update user</button>
+      </b-card-text>
+    </b-card>
   </div>
 </template>
 
@@ -11,19 +22,24 @@ export default {
   name: 'UpdateUser',
   data() {
     return {
-        info: null,
         username: null,
         email: null,
+        userID: null,
     };
   },
   methods: {
     updateUser() {
       axios
-        .get(
-          "http://localhost:4000/api/users/" + this.userID + "&username=" + this.username + "&email" + this.email
-        )
-        .then((response) => (this.info = response.data))
-        .catch((error) => { console.log('Error', error.message); this.info = null;
+        .put(`http://localhost:4000/api/users/${this.userID}/`,
+        {
+          email: this.email,
+          username: this.username,
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
         });
     },
   },
