@@ -2,19 +2,19 @@
   <div>
     <p>WorkingTime View !</p>
     <working-times />
-    <ShowUserWorkingTime />
+    <clock />
   </div>
 </template>
 
 <script>
 import WorkingTimes from "../components/WorkingTimes.vue";
-import ShowUserWorkingTime from "../components/WorkingTime/ShowUserWorkingTime.vue";
+import Clock from "../components/ClockManager.vue";
 
 export default {
   name: "WorkingTimesView",
   components: {
+    Clock,
     WorkingTimes,
-    ShowUserWorkingTime,
   },
 };
 </script>
