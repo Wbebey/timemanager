@@ -1,213 +1,208 @@
 defmodule TimeManagerAPIWeb.WorkingTimesController do
   use TimeManagerAPIWeb, :controller
+  import TimeManagerAPIWeb.Shared
   import Ecto.Query
   require Logger
 
-  def applyThrice(arguments, function) do
-    function.(Enum.at(arguments, 0), Enum.at(arguments, 1), Enum.at(arguments, 2))
-  end
-
-  def createDateTime(input) do
-    split = String.split(input)
-
-    if Enum.count(split) != 2 do
-      {:error, "Invalid format"}
-    else
-      left = split |> Enum.at(0) |> String.split("-")
-      right = split |> Enum.at(1) |> String.split(":")
-
-      parse = fn x -> x |> Integer.parse() |> elem(0) end
-
-      if Enum.count(left) != 3 and Enum.count(right) != 3 do
-        {:error, "Invalid format"}
-      else
-        mydate = left |> Enum.map(parse)
-        mytime = right |> Enum.map(parse)
-
-        NaiveDateTime.new(
-          mydate |> Enum.at(0),
-          mydate |> Enum.at(1),
-          mydate |> Enum.at(2),
-          mytime |> Enum.at(0),
-          mytime |> Enum.at(1),
-          mytime |> Enum.at(2)
-        )
-      end
-    end
-  end
-
-  def dateTimeToString(d) do
-    "#{d.year}-#{d.month}-#{d.day} #{d.hour}:#{d.minute}:#{d.second}"
-  end
-
-  @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
-  def show(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
-    {startstatus, start} = createDateTime(start)
-    {endstatus, myend} = createDateTime(myend)
-
-    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
-      send_resp(conn, 404, "Invalid input")
-    else
-      query =
-        TimeManagerAPI.Repo.all(
-          from u in TimeManagerAPI.Workingtimes,
-            where: u.user == ^userID and u.start >= ^start and u.end <= ^myend,
-            select: u
-        )
-
-      if(Enum.empty?(query)) do
-        send_resp(conn, 404, "No result found")
-      else
-        Logger.debug("ID" <> userID)
-
-        myfiltered =
-          query
-          |> Enum.map(fn x ->
-            %{
-              start: Map.fetch!(x, :start) |> dateTimeToString,
-              user: Map.fetch!(x, :user)
-            }
-            |> Map.put(:end, Map.fetch!(x, :end) |> dateTimeToString)
-          end)
-
-        json(conn, myfiltered)
-      end
-    end
-  end
-
-  def show(conn, %{"userID" => id} = _) do
+  def query_times_from_id(id) do
     query =
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Workingtimes,
           where: u.id == ^id,
-          select: u,
+          select: [:id, :user, :start, :end],
           limit: 1
       )
 
-    if(Enum.empty?(query)) do
-      send_resp(conn, 404, "WorkingTimes not found")
+    if Enum.empty?(query) do
+      {:error, "Working time with id #{id} not found"}
     else
-      myfirst = Enum.at(query, 0)
-
-      func = fn x ->
-        %{
-          start: Map.fetch!(x, :start) |> dateTimeToString,
-          user: Map.fetch!(x, :user)
-        }
-        |> Map.put(:end, Map.fetch!(x, :end) |> dateTimeToString)
-      end
-
-      result = func.(myfirst)
-
-      json(
-        conn,
-        result
-      )
+      {:ok, extract_workingtimes_from_query(query)}
     end
   end
 
-  def show(conn, _params \\ :default) do
-    send_resp(conn, 400, "Invalid arguments")
+  def query_times_for_edition(id) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Workingtimes,
+          where: u.id == ^id,
+          select: [:id, :user, :start, :end],
+          limit: 1
+      )
+
+    if Enum.empty?(query) do
+      {:error, "Working time with id #{id} not found"}
+    else
+      {:ok, query |> Enum.at(0)}
+    end
+  end
+
+  def query_times_from_id_and_times(userID, {:ok, start}, {:ok, myend}) when myend >= start do
+    {:ok,
+     TimeManagerAPI.Repo.all(
+       from u in TimeManagerAPI.Workingtimes,
+         where: u.user == ^userID,
+         where: u.start >= ^start,
+         where: u.end <= ^myend,
+         select: u
+     )
+     |> extract_workingtimes_from_query()}
+  end
+
+  def query_times_from_id_and_times(_, {:ok, _}, {:ok, _}) do
+    {:error, "The start time is after the end time"}
+  end
+
+  def query_times_from_id_and_times(_, {:error, msg}, {f, _}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def query_times_from_id_and_times(_, {f, _}, {:error, msg}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def insert_times_in_db(userID, {:ok, start}, {:ok, myend}) when myend >= start do
+    {status, user} = TimeManagerAPIWeb.UsersController.query_user_from_id(userID)
+
+    case status do
+      :ok ->
+        to_insert = %{user: user.id, start: start, end: myend}
+
+        change_set =
+          TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, to_insert)
+
+        if !Enum.empty?(change_set.errors) do
+          {:error, "Error while inserting"}
+        else
+          case TimeManagerAPI.Repo.insert(change_set) do
+            {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
+            {:error, res} -> {:error, res}
+          end
+        end
+
+      :error ->
+        {:error, user}
+    end
+  end
+
+  def insert_times_in_db(_, {:ok, _}, {:ok, _}) do
+    {:error, "The start time is after the end time"}
+  end
+
+  def insert_times_in_db(_, {:error, msg}, {f, _}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def insert_times_in_db(_, {f, _}, {:error, msg}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def update_time_in_db({:ok, target}, {:ok, start}, {:ok, myend}) when myend >= start do
+    change_set = Ecto.Changeset.change(target, start: start, end: myend)
+
+    if !Enum.empty?(change_set.errors) do
+      {:error, "Error in changeset"}
+    else
+      case TimeManagerAPI.Repo.update(change_set) do
+        {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
+        {:error, _} -> {:error, "Error when updating"}
+      end
+    end
+  end
+
+  def update_time_in_db({:ok, _}, {:ok, _}, {:ok, _}) do
+    {:error, "The start time is after the end time"}
+  end
+
+  def update_time_in_db({:error, msg}, _, _) do
+    {:error, msg}
+  end
+
+  def update_time_in_db(_, {:error, msg}, {f, _}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def update_time_in_db(_, {f, _}, {:error, msg}) when is_atom(f) do
+    {:error, msg}
+  end
+
+  def delete_time_in_db({:ok, target}) do
+    id = target.id
+
+    case TimeManagerAPI.Repo.delete(target) do
+      {:ok, _} -> {:ok, %{message: "Workingtime with id #{id} as been deleted"}}
+      {:error, _} -> {:error, "Error when deleting"}
+    end
+  end
+
+  def delete_time_in_db({:error, msg}) do
+    {:error, msg}
+  end
+
+  def show(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
+    start = create_datetime(start)
+    myend = create_datetime(myend)
+
+    query_times_from_id_and_times(userID, start, myend)
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show(conn, %{"userID" => id} = _) do
+    query_times_from_id(id)
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show(conn, _) do
+    render_json({:error, "Invalid arguments"})
+    |> send_response(conn)
   end
 
   def create(conn, %{"userID" => userID, "start" => start, "end" => myend} = _) do
-    {startstatus, start} = createDateTime(start)
-    {endstatus, myend} = createDateTime(myend)
+    start = create_datetime(start)
+    myend = create_datetime(myend)
 
-    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
-      send_resp(conn, 404, "Invalid input")
-    else
-      queryUser =
-        TimeManagerAPI.Repo.all(
-          from u in TimeManagerAPI.Users,
-            where: u.id == ^userID,
-            select: u
-        )
-
-      if(Enum.empty?(queryUser)) do
-        send_resp(conn, 404, "User not found")
-      else
-        toInsert =
-          %{
-            start: start
-          }
-          |> Map.put(:end, myend)
-          |> Map.put(:user, userID)
-
-        changeSet =
-          TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, toInsert)
-
-        if !Enum.empty?(changeSet.errors) do
-          send_resp(conn, 400, "Invalid email format")
-        else
-          TimeManagerAPI.Repo.insert(changeSet)
-          send_resp(conn, 200, "Created task")
-        end
-      end
-    end
+    insert_times_in_db(userID, start, myend)
+    |> render_json()
+    |> send_response(conn)
   end
 
-  def create(conn, _ \\ :default) do
-    send_resp(conn, 400, "Invalide argument")
+  def create(conn, _) do
+    render_json({:error, "Invalid arguments"})
+    |> send_response(conn)
   end
 
   def update(conn, %{"id" => id, "start" => start, "end" => myend} = _) do
-    Logger.debug("ID" <> id)
-    {startstatus, start} = createDateTime(start)
-    {endstatus, myend} = createDateTime(myend)
+    start = create_datetime(start)
+    myend = create_datetime(myend)
 
-    if Enum.any?([startstatus, endstatus], fn x -> x == :error end) do
-      send_resp(conn, 404, "Invalid input")
-    else
-      query =
-        TimeManagerAPI.Repo.all(
-          from u in TimeManagerAPI.Workingtimes,
-            where: u.id == ^id,
-            select: u
-        )
-
-      if(Enum.empty?(query)) do
-        send_resp(conn, 404, "WorkingTimes not found")
-      else
-        changeSet =
-          Enum.at(query, 0)
-          |> Ecto.Changeset.change(start: start, end: myend)
-
-        if !Enum.empty?(changeSet.errors) do
-          send_resp(conn, 400, "Invalid start or/and end format")
-        else
-          TimeManagerAPI.Repo.update(changeSet)
-          send_resp(conn, 200, "Updated WorkingTimes number " <> id)
-        end
-      end
-    end
+    query_times_for_edition(id)
+    |> update_time_in_db(start, myend)
+    |> render_json()
+    |> send_response(conn)
   end
 
-  def update(conn, _ \\ :default) do
+  def update(conn, _) do
     send_resp(conn, 400, "Missing argument")
   end
 
   def delete(conn, %{"id" => id} = _) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtimes,
-          where: u.id == ^id,
-          select: u
-      )
-
-    if(Enum.empty?(query)) do
-      send_resp(conn, 404, "WorkingTimes not found")
-    else
-      TimeManagerAPI.Repo.delete(Enum.at(query, 0))
-      send_resp(conn, 200, "Deleted WorkingTimes number " <> id)
-    end
+    query_times_for_edition(id)
+    |> delete_time_in_db()
+    |> render_json()
+    |> send_response(conn)
   end
 
-  def delete(conn, _ \\ :default) do
-    send_resp(conn, 400, "Missing id")
+  def delete(conn, _) do
+    render_json({:error, "Invalid arguments"})
+    |> send_response(conn)
   end
 
   def options(conn, _) do
-    send_resp(conn, 200, "Access-Control-Allow-Origin: *")
+    message =
+      "Access-Control-Allow-Origin: *\r\n" <>
+        "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"
+
+    send_resp(conn, 200, message)
   end
 end

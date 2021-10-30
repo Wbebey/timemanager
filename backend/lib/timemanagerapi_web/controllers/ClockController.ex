@@ -1,112 +1,103 @@
 defmodule TimeManagerAPIWeb.ClocksController do
   use TimeManagerAPIWeb, :controller
+  import TimeManagerAPIWeb.Shared
   import Ecto.Query
   require Logger
 
-  @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
+  def stop_clock(query) do
+    clockin = query.time
 
-  def saveClockToWorkingTimes(infos) do
-    result = infos |> Enum.at(0)
+    result_of_update =
+      TimeManagerAPIWeb.WorkingTimesController.insert_times_in_db(
+        query.user,
+        {:ok, clockin},
+        {:ok, NaiveDateTime.local_now()}
+      )
 
-    toInsert =
-      %{
-        start: Map.get(result, :time)
-      }
-      |> Map.put(:end, NaiveDateTime.local_now())
-      |> Map.put(:user, Map.get(result, :user))
+    case result_of_update do
+      {:ok, _} -> change_clock(query, false)
+      {:error, msg} -> {:error, msg}
+    end
+  end
 
-    {insertResult, l} =
-      TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, toInsert)
+  def change_clock(query, status) do
+    change_set = Ecto.Changeset.change(query, status: status, time: NaiveDateTime.local_now())
+
+    if !Enum.empty?(change_set.errors) do
+      {:error, "Error in changeset"}
+    else
+      case TimeManagerAPI.Repo.update(change_set) do
+        {:ok, res} -> {:ok, extract_clock_from_query(res)}
+        {:error, _} -> {:error, "Error when updating"}
+      end
+    end
+  end
+
+  def start_clock(query) do
+    change_clock(query, true)
+  end
+
+  def init_clock(userID) do
+    res =
+      TimeManagerAPI.Clocks.changeset(%TimeManagerAPI.Clocks{}, %{
+        user: userID,
+        time: NaiveDateTime.local_now(),
+        status: true
+      })
       |> TimeManagerAPI.Repo.insert()
 
-    {updateResult, r} =
-      result
-      |> Ecto.Changeset.change(time: NaiveDateTime.local_now(), status: false)
-      |> TimeManagerAPI.Repo.update()
+    case res do
+      {:ok, newclock} -> {:ok, newclock}
+      {:error, _} -> {:error, "Error when creating a new clock"}
+    end
+  end
 
-    Logger.debug(l)
-    Logger.debug(r)
+  def query_clock_for_edition(id) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Clocks,
+          where: u.id == ^id,
+          select: [:id, :user, :status, :time],
+          limit: 1
+      )
 
-    if insertResult == :ok and updateResult == :ok do
-      {:ok, "OK - Clocked out"}
+    if Enum.empty?(query) do
+      {:error, "Clock with id #{id} not found"}
     else
-      {:error, "A DB process failed, but it might have side-effected"}
+      {:ok, query |> Enum.at(0)}
     end
   end
 
-  def startClock(query) do
-    result =
-      Enum.at(query, 0)
-      |> Ecto.Changeset.change(time: NaiveDateTime.local_now(), status: true)
-      |> TimeManagerAPI.Repo.update()
+  def query_clock_from_id(id) do
+    query =
+      TimeManagerAPI.Repo.all(
+        from u in TimeManagerAPI.Clocks,
+          where: u.id == ^id,
+          select: [:id, :user, :status, :time],
+          limit: 1
+      )
 
-    case result do
-      {:ok, _} -> {:ok, "OK - Clocked in"}
-      {:error, _} -> {:error, "Error in DB"}
+    if Enum.empty?(query) do
+      {:error, "Clock with id #{id} not found"}
+    else
+      {:ok, extract_clock_from_query(query)}
     end
-  end
-
-  def initClock(userID) do
-    TimeManagerAPI.Clocks.changeset(%TimeManagerAPI.Clocks{}, %{
-      user: userID,
-      time: NaiveDateTime.local_now()
-    })
-    |> TimeManagerAPI.Repo.insert()
   end
 
   def show(conn, %{"userID" => userID} = _) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Clocks,
-          where: u.user == ^userID,
-          select: u,
-          limit: 1
-      )
-
-    if(Enum.empty?(query)) do
-      send_resp(conn, 404, "No clock found for this user")
-    else
-      myfirst = Enum.at(query, 0)
-
-      json(conn, %{
-        time:
-          Map.fetch!(myfirst, :time)
-          |> TimeManagerAPIWeb.WorkingTimesController.dateTimeToString(),
-        user: Map.fetch!(myfirst, :user),
-        status: Map.fetch!(myfirst, :status)
-      })
-    end
+    query_clock_from_id(userID)
+    |> render_json()
+    |> send_response(conn)
   end
 
   def update(conn, %{"userID" => userID} = _) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Clocks,
-          where: u.user == ^userID,
-          select: u,
-          limit: 1
-      )
-
-    if(Enum.empty?(query)) do
-      initClock(userID)
-      send_resp(conn, 200, "First clock initialised")
-    else
-      myfirst = query |> Enum.at(0)
-
-      {return, message} =
-        case myfirst |> Map.get(:status) do
-          true -> saveClockToWorkingTimes(query)
-          false -> startClock(query)
-        end
-
-      code =
-        case return do
-          :ok -> 200
-          :error -> 400
-        end
-
-      send_resp(conn, code, message)
+    case query_clock_for_edition(userID) do
+      {:ok, clock} when clock.status == true -> stop_clock(clock)
+      {:ok, clock} -> start_clock(clock)
+      {:error, _} -> init_clock(userID)
     end
+    |> render_json()
+    |> send_response(conn)
   end
 
   def options(conn, _) do
