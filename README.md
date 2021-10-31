@@ -32,3 +32,9 @@ docker ps
 ```bash
 docker image ls 
 ```
+
+# Test
+
+## API 
+
+ To test api url's, go to `backend/test/api` and run `./test_api.sh`

@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  database1:
+  database:
     container_name: postgres_timemachine
     environment:
       POSTGRES_PASSWORD: ${PGPASSWORD?err}
@@ -24,7 +24,7 @@ services:
       PGPASSWORD: ${PGPASSWORD?err}
       PGPORT: ${PGPORT?err}
     depends_on:
-      - database1
+      - database
     ports:
       - "${BACKEND_PORT}:4000"
     networks:
