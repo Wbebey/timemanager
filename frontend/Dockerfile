@@ -18,6 +18,8 @@ RUN npm install npm@latest -g
 RUN npm install npm@latest -g
 
 # Install project dependencies
+# If you are building your code for production
+# RUN npm ci --only=production
 # RUN npm install --production
 RUN npm install
 

@@ -22,7 +22,6 @@ checkNewMan() {
     else
         printf "#\tNewman found in $HAS_NEWMAN\n"
     fi
-    #if [ ! -f ""]
 }
 
 runNewman() {

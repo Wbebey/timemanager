@@ -1,0 +1,38 @@
+apiVersion: apps/v1 # Deployment
+kind: Deployment
+metadata:
+  name: backend-deployment-prod
+  namespace: timemanager-25-prod
+  labels:
+    app: backend-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-prod
+  template:
+    metadata:
+      labels:
+        app: backend-prod
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: backend-prod
+        image: docker.io/wbarmis/timemanager:backend
+        ports:
+        - containerPort: 4000
+        imagePullPolicy: Always
+---
+apiVersion: v1 # Service
+kind: Service
+metadata:
+  name: backend-service-prod
+  namespace: timemanager-25-prod
+spec:
+  type: LoadBalancer
+  selector:
+    app: backend-prod
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000

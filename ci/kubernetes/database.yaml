@@ -1,0 +1,38 @@
+apiVersion: apps/v1 # Deployment
+kind: Deployment
+metadata:
+  name: database-deployment-prod
+  namespace: timemanager-25-prod
+  labels:
+    app: database-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database-prod
+  template:
+    metadata:
+      labels:
+        app: database-prod
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: database-prod
+        image: postgres:13-alpine
+        ports:
+        - containerPort: 5432
+        imagePullPolicy: Always
+---
+apiVersion: v1 # Service
+kind: Service
+metadata:
+  name: database-service-prod
+  namespace: timemanager-25-prod
+spec:
+  type: LoadBalancer
+  selector:
+    app: database-prod
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

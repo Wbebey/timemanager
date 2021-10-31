@@ -16,7 +16,7 @@ services:
   backend:
     build: backend/
     container_name: backend_timemachine
-    image: ${BACKEND_IMAGE?err}
+    image: backend_timemachine_image
     environment:
       PGUSER: ${PGUSER?err}
       PGHOST: ${PGHOST?err}
@@ -34,7 +34,7 @@ services:
   frontend:
     build: frontend/
     container_name: frontend_timemachine
-    image: ${FRONTEND_IMAGE?err}
+    image: frontend_timemachine_image
     environment:
       BACKEND_URL: ${BACKEND_URL}
       BACKEND_PORT: ${BACKEND_PORT}
