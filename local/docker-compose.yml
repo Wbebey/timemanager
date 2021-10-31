@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  database1:
+  database:
     container_name: postgres_timemachine
     environment:
       POSTGRES_PASSWORD: ${PGPASSWORD?err}
@@ -14,7 +14,7 @@ services:
       - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
       - "dbdata:${PGDATA}"
   backend:
-    build: backend/
+    build: ../backend/
     container_name: backend_timemachine
     image: backend_timemachine_image
     environment:
@@ -24,7 +24,7 @@ services:
       PGPASSWORD: ${PGPASSWORD?err}
       PGPORT: ${PGPORT?err}
     depends_on:
-      - database1
+      - database
     ports:
       - "${BACKEND_PORT}:4000"
     networks:
@@ -32,12 +32,12 @@ services:
       - timemachine-frontend
     restart: on-failure
   frontend:
-    build: frontend/
+    build: ../frontend/
     container_name: frontend_timemachine
     image: frontend_timemachine_image
-    environment:
-      BACKEND_URL: ${BACKEND_URL}
-      BACKEND_PORT: ${BACKEND_PORT}
+    # environment:
+    #   BACKEND_URL: ${BACKEND_URL}
+    #   BACKEND_PORT: ${BACKEND_PORT}
     depends_on:
       - backend
     ports:

@@ -1,6 +1,6 @@
 FROM elixir:1.12.3
 
-# postgres client
+#  Install postgres client for db connection
 RUN apt-get update && \ 
     apt-get install -y inotify-tools && \
     apt-get install -y postgresql-client
@@ -19,4 +19,4 @@ RUN mix local.rebar --force
 RUN mix do compile
 RUN chmod +x /backend/backendEntrypoint.sh
 
-CMD ["/backend/backendEntrypoint.sh"]
+ENTRYPOINT ["/backend/backendEntrypoint.sh"]
