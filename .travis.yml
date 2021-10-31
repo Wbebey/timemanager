@@ -1,0 +1,36 @@
+---
+services: 
+  - docker
+
+jobs:
+  include:
+    - stage: Tests Frontend
+      if: type = commit AND branch = feature/pipeline
+      install: 
+        - npm install --prefix ./frontend
+
+    - stage: Tests API
+      if: type = commit AND branch = feature/pipeline
+      script:
+        - ./backend/test/api/test_api.sh
+
+    # - stage: Deploy Back
+    #   if: type = commit AND branch = feature/pipeline
+    #   script:
+    #     - docker login -u $DOCKERUSERNAME -p $DOCKERPASSWORD
+    #     - docker-compose build
+    #     - docker commit berthieresteban/timemanager_api:latest
+        
+    # - stage: Deploy Front
+    #   if: type = commit AND branch = feature/pipeline
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - "python3"
+    #         - "python3-pip"
+    #   install:
+    #     - pip3 install awscli --upgrade --user
+    #   script:
+    #     - cd ./frontend
+    #     - npm install
+    #     - npm run build
