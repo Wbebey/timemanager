@@ -19,6 +19,33 @@ spec:
       containers:
       - name: backend-prod
         image: docker.io/wbarmis/timemanager:backend
+        env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: pg_user
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: pg_password
+            - name: PGDATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: pg_database
+            - name: PGPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: pg_port
+                  
+            - name: PGHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: pg_host
         ports:
         - containerPort: 4000
         imagePullPolicy: Always
@@ -30,6 +57,7 @@ metadata:
   namespace: timemanager-25-prod
 spec:
   type: LoadBalancer
+  loadBalancerIP: 34.76.156.238
   selector:
     app: backend-prod
   ports:

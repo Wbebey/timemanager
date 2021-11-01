@@ -19,6 +19,17 @@ spec:
       containers:
       - name: frontend-prod
         image: docker.io/wbarmis/timemanager:frontend
+        env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_url
+            - name: BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_port
         ports:
         - containerPort: 8080
         imagePullPolicy: Always
@@ -30,6 +41,7 @@ metadata:
   namespace: timemanager-25-prod
 spec:
   type: LoadBalancer
+  loadBalancerIP: 35.205.239.126
   selector:
     app: frontend-prod
   ports:

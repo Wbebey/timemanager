@@ -6,16 +6,16 @@ run:
 build:
 		docker-compose build
 
-build-api:
+build-backend:
 		docker-compose build backend
 
-run-api:
+run-backend:
 		docker-compose up backend
 
-build-front:
-		docker-image build frontend
+build-frontend:
+		docker-compose build frontend
 
-run-front:
+run-frontend:
 		docker-compose up frontend
 
 test:

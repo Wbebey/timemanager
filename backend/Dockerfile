@@ -19,4 +19,6 @@ RUN mix local.rebar --force
 RUN mix do compile
 RUN chmod +x /backend/backendEntrypoint.sh
 
+EXPOSE 4000
+
 ENTRYPOINT ["/backend/backendEntrypoint.sh"]
