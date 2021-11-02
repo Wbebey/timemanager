@@ -14,7 +14,11 @@ services:
       - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
       - "dbdata:/var/lib/postgresql/data/pgdata"
   backend:
-    build: backend/
+    build: 
+      context: backend/
+      args:
+        GITHUB_SHA: ${GITHUB_SHA}
+        GITHUB_REF: ${GITHUB_REF}
     container_name: backend_timemachine
     image: gcr.io/timemanager-330510/timemanager_backend:1.0.0
     environment:
@@ -32,9 +36,13 @@ services:
       - timemachine-frontend
     restart: on-failure
   frontend:
-    build: frontend/
+    build: 
+      context: frontend/
+      args:
+        GITHUB_SHA: ${GITHUB_SHA}
+        GITHUB_REF: ${GITHUB_REF}
     container_name: frontend_timemachine
-    image: gcr.io/timemanager-330510/timemanager_backend:1.0.0
+    image: gcr.io/timemanager-330510/timemanager_frontend:1.0.0
     environment:
       BACKEND_URL: ${BACKEND_URL}
       BACKEND_PORT: ${BACKEND_PORT}

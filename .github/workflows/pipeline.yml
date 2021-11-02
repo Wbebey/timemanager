@@ -28,8 +28,8 @@ jobs:
     - name: Trigger Message 📥
       run: |-
         echo " The job was automatically triggered by a ${{ github.event_name }} event."
-        echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-        echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+        echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+        echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
     - name: Checkout 😇
       uses: actions/checkout@v2
     # Setup gcloud CLI
@@ -55,6 +55,7 @@ jobs:
       run: |-
         ls ${{ github.workspace }}
         docker-compose build
+        docker images ls
     # Push the Docker image to Google Container Registry
     - name: Publish 🛫
       run: |-
@@ -76,9 +77,6 @@ jobs:
         kubectl apply -f backend.yaml && \
         kubectl apply -f frontend.yaml && \
         kubectl apply -f database.yaml
-        kubectl rollout status deployment/$DEPLOYMENT_NAME_DB
-        kubectl rollout status deployment/$DEPLOYMENT_NAME_BACK
-        kubectl rollout status deployment/$DEPLOYMENT_NAME_FRONT
     # Cleanup
     - name: Cleanup 🚿
       run: |-
