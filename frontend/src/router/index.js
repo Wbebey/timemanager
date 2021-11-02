@@ -5,6 +5,7 @@ Vue.use(VueRouter)
 
 const routes = [
   { path: '/', component: () => import("../views/Home.vue") },
+  { path: '/about', component: () => import("../views/About.vue") },
   { path: '/register', component: () => import("../views/Register.vue") },
   { path: '/user/:userId', component: () => import("../views/UserView.vue") },
   { path: '/workingTimes', component: () => import("../views/WorkingTimesView.vue") },

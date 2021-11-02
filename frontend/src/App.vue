@@ -1,31 +1,33 @@
 <template>
   <v-app>
     <v-app-bar app color="primary">
-      <v-divider />
-      <div class="float-left">
-        <v-btn value="recent">
-          <span>Home</span>
+      <v-container>
+        <v-row>
+          <v-divider />
+        </v-row>
+        <v-row>
+          <v-btn value="recent" @click="ChangeRoute(`/`)">
+            <span>Home</span>
 
-          <v-icon>mdi-history</v-icon>
-        </v-btn>
+            <v-icon>mdi-home</v-icon>
+          </v-btn>
 
-        <v-btn value="favorites">
-          <span>Register</span>
+          <v-btn value="favorites" @click="ChangeRoute(`/register`)">
+            <span>Register</span>
 
-          <v-icon>mdi-heart</v-icon>
-        </v-btn>
+            <v-icon>mdi-account-plus</v-icon>
+          </v-btn>
 
-        <v-btn value="nearby">
-          <span>About</span>
+          <v-btn value="nearby" @click="ChangeRoute(`/about`)">
+            <span>About</span>
 
-          <v-icon>mdi-map-marker</v-icon>
-        </v-btn>
-      </div>
+            <v-icon>mdi-information-outline</v-icon>
+          </v-btn>
+        </v-row>
+      </v-container>
     </v-app-bar>
     <v-main>
       <v-container fluid>
-        <router-link to="/">Home </router-link>
-        <router-link to="/register">Register </router-link>
         <router-view />
       </v-container>
     </v-main>
@@ -51,5 +53,10 @@ export default {
   data: () => ({
     icons: ["mdi-home", "mdi-email", "mdi-calendar", "mdi-delete"],
   }),
+  methods: {
+    ChangeRoute(path) {
+      this.$router.push(path);
+    }
+  },
 };
 </script>

@@ -1,0 +1,50 @@
+apiVersion: apps/v1 # Deployment
+kind: Deployment
+metadata:
+  name: frontend-deployment-prod
+  namespace: timemanager-25-prod
+  labels:
+    app: frontend-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-prod
+  template:
+    metadata:
+      labels:
+        app: frontend-prod
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: frontend-prod
+        image: docker.io/wbarmis/timemanager:frontend
+        env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_url
+            - name: BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: backend_port
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
+---
+apiVersion: v1 # Service
+kind: Service
+metadata:
+  name: frontend-service-prod
+  namespace: timemanager-25-prod
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 35.205.239.126
+  selector:
+    app: frontend-prod
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

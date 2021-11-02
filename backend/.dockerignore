@@ -1,3 +1,7 @@
+# ignore .git and .cache folders
+.git
+.cache
+
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -34,10 +38,3 @@ npm-debug.log
 
 #env files
 .env
-<<<<<<< HEAD
-.env.*
-.*.env
-=======
-*.env
-.env*
->>>>>>> feature(docker): all docker work well
