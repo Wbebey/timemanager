@@ -1,0 +1,5 @@
+$env:PGUSER = "postgres"
+$env:PGHOST = "localhost"
+$env:PGDATABASE = "timemanagerapi_dev"
+$env:PGPASSWORD = "postgres"
+$env:PGPORT = "5432"

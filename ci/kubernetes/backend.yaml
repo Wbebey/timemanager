@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: backend-prod
-        image: docker.io/wbarmis/timemanager:backend
+        image: gcr.io/timemanager-330510/timemanager_backend:1.0.0
         env:
             - name: PGUSER
               valueFrom:
