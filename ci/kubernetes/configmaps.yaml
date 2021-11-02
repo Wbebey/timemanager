@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: timemanager-25-prod
+data:
+  pg_host: database-service-prod
+  pg_database: timemanagerapi_dev
+  pg_port: "5432"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: timemanager-25-prod
+data:
+  backend_url: "34.187.9.210"
+  backend_port: "4000"

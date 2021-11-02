@@ -1,0 +1,85 @@
+name: Kubernetes Deployment 
+
+on:
+  push:
+    branches: 
+      - $default-branch
+      - feature/*
+  pull_request:
+    branches: [ master ]
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: timemanager-25    
+  GKE_ZONE: europe-west1   
+  IMAGE_FRONTEND: timemanager_frontend
+  IMAGE_BACKEND: timemanager_backend
+  VERSION: "1.0.0"
+  DEPLOYMENT_NAME_DB: backend-deployment-prod
+  DEPLOYMENT_NAME_BACK: database-deployment-prod
+  DEPLOYMENT_NAME_FRONT: frontend-deployment-prod
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Trigger Message 📥
+      run: |-
+        echo " The job was automatically triggered by a ${{ github.event_name }} event."
+        echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+        echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+    - name: Checkout 😇
+      uses: actions/checkout@v2
+    # Setup gcloud CLI
+    - name: GCLOUD authentification 🤑
+      uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - name: Docker Setup 🗳
+      run: |-
+        gcloud --quiet auth configure-docker
+    # Get the GKE credentials so we can deploy to the cluster
+    - name: Setup GKE 🔨
+      uses: google-github-actions/get-gke-credentials@v0.2.1
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+    # Build the Docker images
+    - name: Build 🏗
+      run: |-
+        ls ${{ github.workspace }}
+        docker-compose build
+        docker images ls
+    # Push the Docker image to Google Container Registry
+    - name: Publish 🛫
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$VERSION"
+        docker push "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:$VERSION"
+    # Due to an issue with rolling update, we have to remove deployment (pods) before (re-)deploy
+    - name: Delete 🚮
+      run: |-
+        kubectl delete deployment $DEPLOYMENT_NAME_BACK  --namespace timemanager-25-prod && \
+        kubectl delete deployment $DEPLOYMENT_NAME_FRONT  --namespace timemanager-25-prod && \
+        sleep 5
+    # Deploy the Docker image to the GKE cluster
+    - name: Deploy 🛬
+      run: |-
+        cd ci/kubernetes
+        kubectl apply -f namaspace.yaml && \
+        kubectl apply -f configmaps.yaml && \
+        kubectl apply -f secrets.yaml  && \
+        kubectl apply -f backend.yaml && \
+        kubectl apply -f frontend.yaml && \
+        kubectl apply -f database.yaml
+    # Cleanup
+    - name: Cleanup 🚿
+      run: |-
+        docker images
+        docker system prune -a -f
+        echo "🎉 This job's status is ${{ job.status }}."
