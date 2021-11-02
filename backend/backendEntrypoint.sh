@@ -18,6 +18,7 @@ if [[ -z `psql -Atqc "\\list $PGDATABASE"` ]]; then
 else
     echo "Database $PGDATABASE exists. Starting reset..."
     mix ecto.reset
+    mix ecto.setup
     echo "Database $PGDATABASE reset."
 fi
 

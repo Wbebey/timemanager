@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: frontend-prod
-        image: docker.io/wbarmis/timemanager:frontend
+        image: gcr.io/timemanager-330510/timemanager_frontend:1.0.0
         env:
             - name: BACKEND_URL
               valueFrom:
