@@ -21,6 +21,10 @@ run-frontend:
 test:
 	./backend/test/api/test_api.sh
 
+repo:
+	git remote add kube git@github.com:Wbebey/timemanager.git && \
+	git remote -v
+
 push:
 	docker push wbarmis/timemanager:backend && \
 	docker push wbarmis/timemanager:frontend
@@ -45,4 +49,4 @@ deploy:
 	@$(MAKE) kube_deploy
 
 
-.PHONY: run build build-backend run-backend build-frontend run-frontend test push kube_deploy kube_delete deploy
+.PHONY: run build build-backend run-backend build-frontend run-frontend test push kube_deploy kube_delete deploy repo
