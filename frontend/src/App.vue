@@ -1,62 +1,38 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary">
-      <v-container>
-        <v-row>
-          <v-divider />
-        </v-row>
-        <v-row>
-          <v-btn value="recent" @click="ChangeRoute(`/`)">
-            <span>Home</span>
-
-            <v-icon>mdi-home</v-icon>
-          </v-btn>
-
-          <v-btn value="favorites" @click="ChangeRoute(`/register`)">
-            <span>Register</span>
-
-            <v-icon>mdi-account-plus</v-icon>
-          </v-btn>
-
-          <v-btn value="nearby" @click="ChangeRoute(`/about`)">
-            <span>About</span>
-
-            <v-icon>mdi-information-outline</v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
-    </v-app-bar>
-    <v-main>
-      <v-container fluid>
-        <router-view />
-      </v-container>
-    </v-main>
-    <v-footer>
-      <v-card
-        flat
-        tile
-        width="100%"
-        color="primary"
-        class="lighten-1 text-center"
-      >
-        <v-card-text class="white--text">
-          {{ new Date().getFullYear() }} — <strong>Time Manager</strong>
-        </v-card-text>
-      </v-card>
-    </v-footer>
+    <div v-if="userId == null">
+      <p>Is loading</p>
+    </div>
+    <div v-else-if="userId == 0">
+      <app-bar />
+    </div>
+    <div v-else>
+      <p>Welcome enculé numéro {{ userID }}</p>
+    </div>
+    <router-view />
   </v-app>
 </template>
 
 <script>
+import AppBar from "./components/AppBar.vue";
+import { getCookie } from "./cookie";
+
 export default {
   name: "App",
+  components: {
+    AppBar,
+  },
   data: () => ({
-    icons: ["mdi-home", "mdi-email", "mdi-calendar", "mdi-delete"],
+    userId: null,
   }),
-  methods: {
-    ChangeRoute(path) {
-      this.$router.push(path);
+  created() {
+    let cookie = getCookie("userId");
+    if (cookie == "") {
+      this.userId = 0;
+    } else {
+      this.userId = parseInt(cookie, 10);
     }
   },
+  methods: {},
 };
 </script>

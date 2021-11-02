@@ -39,7 +39,6 @@ export default {
         })
         .catch((error) => {
           console.log("Error", error.message);
-          this.info = null;
         });
     },
     getUserWithUsernameAndEmail() {
