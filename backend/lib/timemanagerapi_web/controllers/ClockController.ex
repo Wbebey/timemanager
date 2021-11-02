@@ -47,56 +47,75 @@ defmodule TimeManagerAPIWeb.ClocksController do
       |> TimeManagerAPI.Repo.insert()
 
     case res do
-      {:ok, newclock} -> {:ok, newclock}
+      {:ok, newclock} -> {:ok, extract_clock_from_query(newclock)}
       {:error, _} -> {:error, "Error when creating a new clock"}
     end
   end
 
-  def query_clock_for_edition(id) do
+  def query_clock_for_edition(userID) do
     query =
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Clocks,
-          where: u.id == ^id,
+          where: u.user == ^userID,
           select: [:id, :user, :status, :time],
           limit: 1
       )
 
     if Enum.empty?(query) do
-      {:error, "Clock with id #{id} not found"}
+      {:error, "Clock with for user with ID #{userID} not found"}
     else
       {:ok, query |> Enum.at(0)}
     end
   end
 
-  def query_clock_from_id(id) do
+  def query_clock_from_id(userID) do
     query =
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Clocks,
-          where: u.id == ^id,
+          where: u.user == ^userID,
           select: [:id, :user, :status, :time],
           limit: 1
       )
 
     if Enum.empty?(query) do
-      {:error, "Clock with id #{id} not found"}
+      {:error, "Clock for user with id #{userID} not found"}
     else
       {:ok, extract_clock_from_query(query)}
     end
   end
 
   def show(conn, %{"userID" => userID} = _) do
-    query_clock_from_id(userID)
+    case TimeManagerAPIWeb.UsersController.query_user_from_id(userID) do
+      {:ok, _} -> query_clock_from_id(userID)
+      {:error, msg} -> {:error, msg}
+    end
     |> render_json()
     |> send_response(conn)
   end
 
+  def show(conn, _) do
+    render_json({:error, "Invalid arguments"})
+    |> send_response(conn)
+  end
+
   def update(conn, %{"userID" => userID} = _) do
-    case query_clock_for_edition(userID) do
-      {:ok, clock} when clock.status == true -> stop_clock(clock)
-      {:ok, clock} -> start_clock(clock)
-      {:error, _} -> init_clock(userID)
+    case TimeManagerAPIWeb.UsersController.query_user_from_id(userID) do
+      {:ok, _} ->
+        case query_clock_for_edition(userID) do
+          {:ok, clock} when clock.status == true -> stop_clock(clock)
+          {:ok, clock} -> start_clock(clock)
+          {:error, _} -> init_clock(userID)
+        end
+
+      {:error, msg} ->
+        {:error, msg}
     end
     |> render_json()
+    |> send_response(conn)
+  end
+
+  def update(conn, _) do
+    render_json({:error, "Invalid arguments"})
     |> send_response(conn)
   end
 
