@@ -3,10 +3,10 @@ name: Kubernetes Deployment
 on:
   push:
     branches: 
-      - $default-branch
+      - main
       - feature/*
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -15,8 +15,8 @@ env:
   IMAGE_FRONTEND: timemanager_frontend
   IMAGE_BACKEND: timemanager_backend
   VERSION: "1.0.0"
-  DEPLOYMENT_NAME_DB: backend-deployment-prod
-  DEPLOYMENT_NAME_BACK: database-deployment-prod
+  DEPLOYMENT_NAME_DB: database-deployment-prod
+  DEPLOYMENT_NAME_BACK: backend-deployment-prod
   DEPLOYMENT_NAME_FRONT: frontend-deployment-prod
 
 jobs:
