@@ -57,7 +57,7 @@ metadata:
   namespace: timemanager-25-prod
 spec:
   type: LoadBalancer
-  loadBalancerIP: 34.76.156.238
+  loadBalancerIP: 34.140.100.13
   selector:
     app: backend-prod
   ports:

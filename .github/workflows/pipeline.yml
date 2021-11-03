@@ -62,11 +62,11 @@ jobs:
         docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$VERSION"
         docker push "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:$VERSION"
     # Due to an issue with rolling update, we have to remove deployment (pods) before (re-)deploy
-    - name: Delete 🚮
-      run: |-
-        kubectl delete deployment $DEPLOYMENT_NAME_BACK  --namespace timemanager-25-prod && \
-        kubectl delete deployment $DEPLOYMENT_NAME_FRONT  --namespace timemanager-25-prod && \
-        sleep 5
+    # - name: Delete 🚮
+    #   run: |-
+    #     kubectl delete deployment $DEPLOYMENT_NAME_BACK  --namespace timemanager-25-prod && \
+    #     kubectl delete deployment $DEPLOYMENT_NAME_FRONT  --namespace timemanager-25-prod && \
+    #     sleep 5
     # Deploy the Docker image to the GKE cluster
     - name: Deploy 🛬
       run: |-
