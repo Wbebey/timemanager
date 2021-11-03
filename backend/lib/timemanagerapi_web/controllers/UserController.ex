@@ -41,7 +41,6 @@ defmodule TimeManagerAPIWeb.UsersController do
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
           where: u.id == ^id,
-          select: ^user_attributs(),
           limit: 1
       )
 

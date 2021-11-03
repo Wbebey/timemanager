@@ -32,8 +32,8 @@ defmodule TimeManagerAPIWeb.ManagerController do
     end
   end
 
-  def update_user_in_db({:error, message}, _, _) do
-    {:error, message}
+  def update_manager_in_db({:error, msg}, _) do
+    {:error, msg}
   end
 
   def show(conn, %{"userID" => userID} = _) do
@@ -49,9 +49,7 @@ defmodule TimeManagerAPIWeb.ManagerController do
   end
 
   def update(conn, %{"user" => user, "manager" => manager} = _) do
-    manager = TimeManagerAPIWeb.UsersController.query_user_from_id(manager)
-
-    case manager do
+    case TimeManagerAPIWeb.UsersController.query_user_from_id(manager) do
       {:ok, _} ->
         TimeManagerAPIWeb.UsersController.query_user_for_edition(user)
         |> update_manager_in_db(manager)
