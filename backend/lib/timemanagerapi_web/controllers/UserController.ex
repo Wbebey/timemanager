@@ -9,7 +9,7 @@ defmodule TimeManagerAPIWeb.UsersController do
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
           where: u.email == ^email and u.username == ^username,
-          select: [:id, :username, :email],
+          select: ^user_attributs(),
           limit: 1
       )
 
@@ -25,7 +25,7 @@ defmodule TimeManagerAPIWeb.UsersController do
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
           where: u.id == ^id,
-          select: [:id, :username, :email],
+          select: ^user_attributs(),
           limit: 1
       )
 
@@ -41,7 +41,7 @@ defmodule TimeManagerAPIWeb.UsersController do
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
           where: u.id == ^id,
-          select: [:id, :username, :email],
+          select: ^user_attributs(),
           limit: 1
       )
 
@@ -52,7 +52,7 @@ defmodule TimeManagerAPIWeb.UsersController do
     end
   end
 
-  def query_user_for_duplicates(username, email) do
+  def query_user_for_duplicates(username, email, manager_id \\ nil) do
     query =
       TimeManagerAPI.Repo.all(
         from u in TimeManagerAPI.Users,
@@ -63,7 +63,7 @@ defmodule TimeManagerAPIWeb.UsersController do
     if !Enum.empty?(query) do
       {:error, "User has a duplicate username or email"}
     else
-      {:ok, {username, email}}
+      {:ok, {username, email, manager_id}}
     end
   end
 
@@ -84,8 +84,8 @@ defmodule TimeManagerAPIWeb.UsersController do
     |> send_response(conn)
   end
 
-  def insert_user_in_db({:ok, {username, email}}) do
-    to_insert = %{username: username, email: email}
+  def insert_user_in_db({:ok, {username, email, manager_id}}) do
+    to_insert = %{username: username, email: email, manager_id: manager_id}
     change_set = TimeManagerAPI.Users.changeset(%TimeManagerAPI.Users{}, to_insert)
 
     if !Enum.empty?(change_set.errors) do
@@ -100,6 +100,13 @@ defmodule TimeManagerAPIWeb.UsersController do
 
   def insert_user_in_db({:error, message}) do
     {:error, message}
+  end
+
+  def create(conn, %{"email" => email, "username" => username, "manager_id" => manager_id} = _) do
+    query_user_for_duplicates(username, email, manager_id)
+    |> insert_user_in_db()
+    |> render_json()
+    |> send_response(conn)
   end
 
   def create(conn, %{"email" => email, "username" => username} = _) do

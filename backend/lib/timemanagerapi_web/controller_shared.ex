@@ -1,6 +1,8 @@
 defmodule TimeManagerAPIWeb.Shared do
   import Plug.Conn
 
+  def user_attributs, do: [:id, :username, :email, :manager]
+
   def create_datetime(input) do
     split = String.split(input)
 
@@ -38,7 +40,8 @@ defmodule TimeManagerAPIWeb.Shared do
     %{
       id: head.id,
       username: head.username,
-      email: head.email
+      email: head.email,
+      manager: head.manager
     }
   end
 
@@ -46,7 +49,8 @@ defmodule TimeManagerAPIWeb.Shared do
     %{
       id: head.id,
       username: head.username,
-      email: head.email
+      email: head.email,
+      manager: head.manager
     }
   end
 

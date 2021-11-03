@@ -5,6 +5,7 @@ defmodule TimeManagerAPI.Users do
   schema "users" do
     field :email, :string
     field :username, :string
+    field :manager, :id
 
     timestamps()
   end

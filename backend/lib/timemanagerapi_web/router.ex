@@ -45,6 +45,13 @@ defmodule TimeManagerAPIWeb.Router do
       options("/", ClocksController, :options)
       options("/:userID", ClocksController, :options)
     end
+
+    scope "/manager" do
+      get("/:userID", ManagerController, :show)
+      post("/", ManagerController, :update)
+      delete("/:userID", ManagerController, :delete)
+      options("/", ManagerController, :options)
+    end
   end
 
   # Enables LiveDashboard only for development
