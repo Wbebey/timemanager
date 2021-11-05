@@ -122,6 +122,65 @@ defmodule TimeManagerAPIWeb.UsersController do
     |> send_response(conn)
   end
 
+  # using a changeset, update the field "role" of the user
+  def promote_user(user, newRole) do
+    change_set = Ecto.Changeset.change(user, role: newRole)
+
+    if !Enum.empty?(change_set.errors) do
+      {:error, "Invalid format for the role"}
+    else
+      case TimeManagerAPI.Repo.update(change_set) do
+        {:ok, res} -> {:ok, extract_user_from_query(res)}
+        {:error, _} -> {:error, "Error when updating"}
+      end
+    end
+  end
+
+  def promote(conn, %{"userID" => userID, "role" => "root"} = _) do
+    user = TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID)
+
+    case user do
+      nil -> {:error, "Error when getting user"}
+      user -> promote_user(user, :root)
+    end
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def promote(conn, %{"userID" => userID, "role" => "manager"} = _) do
+    user = TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID)
+
+    case user do
+      nil -> {:error, "Error when getting user"}
+      user -> promote_user(user, :manager)
+    end
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def promote(conn, %{"userID" => userID, "role" => "employe"} = _) do
+    user = TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID)
+
+    case user do
+      nil -> {:error, "Error when getting user"}
+      user -> promote_user(user, :employe)
+    end
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def promote(conn, %{"userID" => _, "role" => role}) do
+    {:error, "Role #{role} is not valid."}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def promote(conn, _) do
+    {:error, "Invalid arguments"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
   def delete_user_in_db({:ok, user}) do
     username = user.username
 

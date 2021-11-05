@@ -53,6 +53,22 @@ defmodule TimeManagerAPIWeb.TeamsController do
     {:ok, team.users |> Enum.map(&extract_user_from_query/1)}
   end
 
+  def get_workingtimes_of_team(team, start, myend) do
+    try do
+      times =
+        team
+        |> get_relation(:users)
+        |> get_relation(:times)
+        |> List.flatten()
+        |> Enum.filter(fn x -> x.start >= start and x.end <= myend end)
+        |> extract_workingtimes_from_query()
+
+      {:ok, times}
+    rescue
+      _ -> {:error, "Error while fetching Team #{team.name}"}
+    end
+  end
+
   def get_workingtimes_of_team(team) do
     # team = team |> TimeManagerAPI.Repo.preload(:users)
     # users = team.users |> TimeManagerAPI.Repo.preload(:times)
@@ -171,6 +187,22 @@ defmodule TimeManagerAPIWeb.TeamsController do
 
   def get_users(conn, _) do
     {:error, "Invalid arguments"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def get_times(conn, %{"teamID" => teamID, "start" => start, "end" => myend} = _) do
+    {startstatus, start} = create_datetime(start)
+    {endstatus, myend} = create_datetime(myend)
+    team = TimeManagerAPI.Repo.get(TimeManagerAPI.Team, teamID)
+
+    case {team, startstatus, endstatus} do
+      {nil, _, _} -> {:error, "Error when getting team"}
+      {_, :error, _} -> {:error, "Error when parsing start date"}
+      {_, _, :error} -> {:error, "Error when parsing end date"}
+      {_, :ok, :ok} when myend < start -> {:error, "End date must be after start date"}
+      {team, _, _} -> get_workingtimes_of_team(team, start, myend)
+    end
     |> render_json()
     |> send_response(conn)
   end

@@ -30,6 +30,7 @@ defmodule TimeManagerAPIWeb.Shared do
         mydate = left |> Enum.map(parse)
         mytime = right |> Enum.map(parse)
 
+        # Returns a {:ok, NaiveDateTime} or a {:error, reason} by itself
         NaiveDateTime.new(
           mydate |> Enum.at(0),
           mydate |> Enum.at(1),
@@ -46,19 +47,20 @@ defmodule TimeManagerAPIWeb.Shared do
     "#{d.year}-#{d.month}-#{d.day} #{d.hour}:#{d.minute}:#{d.second}"
   end
 
+  def extract_users_from_query(list) do
+    list |> Enum.map(&extract_user_from_query/1)
+  end
+
   def extract_user_from_query([head | tail]) when tail == [] do
-    %{
-      id: head.id,
-      username: head.username,
-      email: head.email
-    }
+    extract_user_from_query(head)
   end
 
   def extract_user_from_query(head) do
     %{
       id: head.id,
       username: head.username,
-      email: head.email
+      email: head.email,
+      role: head.role
     }
   end
 
@@ -99,8 +101,6 @@ defmodule TimeManagerAPIWeb.Shared do
   end
 
   def extract_workingtimes_from_query(elems) when is_list(elems) do
-    IO.inspect(elems)
-
     elems
     |> Enum.map(&extract_workingtime_from_query/1)
   end
@@ -132,8 +132,6 @@ defmodule TimeManagerAPIWeb.Shared do
       |> Ecto.Changeset.change()
       |> Ecto.Changeset.put_assoc(:users, [user | team.users])
       |> TimeManagerAPI.Repo.update()
-
-    IO.inspect(changes)
 
     case changes do
       {:ok, team} -> {:ok, extract_team_from_query(team)}

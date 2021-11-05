@@ -17,10 +17,13 @@ defmodule TimeManagerAPIWeb.Router do
       get("/:userID", UsersController, :show)
       # update
       put("/:userID", UsersController, :update)
+      # promote
+      put("/:userID/promote/:role", UsersController, :promote)
       # delete
       delete("/:userID", UsersController, :delete)
       options("/", UsersController, :options)
       options("/:userID", UsersController, :options)
+      options("/:userID/promote", UsersController, :options)
     end
 
     scope "/teams" do
@@ -42,6 +45,8 @@ defmodule TimeManagerAPIWeb.Router do
       # remove user from team
       delete("/:teamID/users/:userID", TeamsController, :remove_user)
       options("/", TeamsController, :options)
+      options("/:teamID", TeamsController, :options)
+      options("/:teamID/users/", TeamsController, :options)
     end
 
     scope "/workingtimes" do
@@ -51,7 +56,10 @@ defmodule TimeManagerAPIWeb.Router do
       # Get all of user
       get("/:userID", WorkingTimesController, :show)
       # Get specific timeframe
-      get("/:id", WorkingTimesController, :show)
+      # This road is commented out because it is not used, as it is handled by the one above
+      # It's mostly to prevent a warning on compilation
+      # The relevant business logic is handled in the controller anyway
+      # get("/:id", WorkingTimesController, :show)
       # update
       put("/:id", WorkingTimesController, :update)
       # delete
