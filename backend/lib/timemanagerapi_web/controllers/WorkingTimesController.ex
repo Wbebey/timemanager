@@ -18,6 +18,28 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     end
   end
 
+  def get_workingtimes_of_team(nil) do
+    {:error, "Team not found"}
+  end
+
+  def get_workingtimes_of_team(team) do
+    # team = team |> TimeManagerAPI.Repo.preload(:users)
+    # users = team.users |> TimeManagerAPI.Repo.preload(:times)
+
+    try do
+      times =
+        team
+        |> get_relation(:users)
+        |> get_relation(:times)
+        |> Enum.map(&extract_workingtimes_from_query/1)
+        |> List.flatten()
+
+      {:ok, times}
+    rescue
+      _ -> {:error, "Error while fetching Team #{team.name}"}
+    end
+  end
+
   def query_times_from_id_and_times(userID, {:ok, start}, {:ok, myend}) when myend >= start do
     case TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID) do
       nil ->
@@ -137,6 +159,13 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
 
   def show(conn, %{"userID" => id} = _) do
     query_times_from_id(id)
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def test(conn, %{"teamID" => teamID} = _) do
+    TimeManagerAPI.Repo.get(TimeManagerAPI.Team, teamID)
+    |> get_workingtimes_of_team()
     |> render_json()
     |> send_response(conn)
   end

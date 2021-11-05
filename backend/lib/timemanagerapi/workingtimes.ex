@@ -6,8 +6,6 @@ defmodule TimeManagerAPI.Workingtime do
     field :end, :naive_datetime
     field :start, :naive_datetime
     belongs_to :user, TimeManagerAPI.User
-
-    timestamps()
   end
 
   @doc false

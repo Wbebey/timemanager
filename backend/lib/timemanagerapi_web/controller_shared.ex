@@ -1,6 +1,18 @@
 defmodule TimeManagerAPIWeb.Shared do
   import Plug.Conn
 
+  def get_relation(list, relation) when is_list(list) do
+    list
+    |> Enum.map(fn x -> TimeManagerAPI.Repo.preload(x, relation) end)
+    |> Enum.map(fn x -> Map.get(x, relation) end)
+  end
+
+  def get_relation(item, relation) do
+    item
+    |> TimeManagerAPI.Repo.preload(relation)
+    |> Map.get(relation)
+  end
+
   def create_datetime(input) do
     split = String.split(input)
 
@@ -87,6 +99,8 @@ defmodule TimeManagerAPIWeb.Shared do
   end
 
   def extract_workingtimes_from_query(elems) when is_list(elems) do
+    IO.inspect(elems)
+
     elems
     |> Enum.map(&extract_workingtime_from_query/1)
   end

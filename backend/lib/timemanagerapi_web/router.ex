@@ -31,6 +31,7 @@ defmodule TimeManagerAPIWeb.Router do
       get("/:userID", WorkingTimesController, :show)
       # Get specific timeframe
       get("/:id", WorkingTimesController, :show)
+      get("/team/:teamID", WorkingTimesController, :test)
       # update
       put("/:id", WorkingTimesController, :update)
       # delete
