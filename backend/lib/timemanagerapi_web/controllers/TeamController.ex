@@ -194,4 +194,12 @@ defmodule TimeManagerAPIWeb.TeamsController do
     |> render_json()
     |> send_response(conn)
   end
+
+  def options(conn, _) do
+    message =
+      "Access-Control-Allow-Origin: *\r\n" <>
+        "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"
+
+    send_resp(conn, 200, message)
+  end
 end

@@ -41,6 +41,7 @@ defmodule TimeManagerAPIWeb.Router do
       get("/:teamID/times", TeamsController, :get_times)
       # remove user from team
       delete("/:teamID/users/:userID", TeamsController, :remove_user)
+      options("/", TeamsController, :options)
     end
 
     scope "/workingtimes" do
