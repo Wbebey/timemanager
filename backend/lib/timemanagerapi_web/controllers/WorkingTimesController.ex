@@ -61,6 +61,8 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def insert_times_in_db(userID, {:ok, start}, {:ok, myend}) when myend >= start do
+    IO.inspect(%{start: start, end: myend})
+    user = TimeManagerAPI.Repo.get(TimeManagerAPI.Users, userID)
     {status, user} = TimeManagerAPIWeb.UsersController.query_user_from_id(userID)
 
     case status do
@@ -84,7 +86,8 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     end
   end
 
-  def insert_times_in_db(_, {:ok, _}, {:ok, _}) do
+  def insert_times_in_db(_, {:ok, l}, {:ok, r}) do
+    IO.inspect(%{start: l, end: r})
     {:error, "The start time is after the end time"}
   end
 
@@ -94,6 +97,25 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
 
   def insert_times_in_db(_, {f, _}, {:error, msg}) when is_atom(f) do
     {:error, msg}
+  end
+
+  def insert_times_in_db(userID, start, myend) do
+    to_insert = %{user: userID, start: start, end: myend}
+
+    change_set = TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, to_insert)
+
+    change_set.errors |> IO.inspect()
+    userID |> IO.inspect()
+    to_insert |> IO.inspect()
+
+    if !Enum.empty?(change_set.errors) do
+      {:error, "Error while inserting"}
+    else
+      case TimeManagerAPI.Repo.insert(change_set) do
+        {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
+        {:error, res} -> {:error, res}
+      end
+    end
   end
 
   def update_time_in_db({:ok, target}, {:ok, start}, {:ok, myend}) when myend >= start do

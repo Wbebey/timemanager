@@ -4,14 +4,17 @@ defmodule TimeManagerAPIWeb.ClocksController do
   import Ecto.Query
   require Logger
 
-  def stop_clock(query) do
+  def stop_clock(query, userID) do
     clockin = query.time
+
+    IO.inspect("clockin")
+    IO.inspect(clockin)
 
     result_of_update =
       TimeManagerAPIWeb.WorkingTimesController.insert_times_in_db(
-        query.user,
-        {:ok, clockin},
-        {:ok, NaiveDateTime.local_now()}
+        userID,
+        clockin,
+        NaiveDateTime.local_now()
       )
 
     case result_of_update do
@@ -34,60 +37,71 @@ defmodule TimeManagerAPIWeb.ClocksController do
   end
 
   def start_clock(query) do
+    IO.inspect("start_clock")
     change_clock(query, true)
+  end
+
+  def link_clock_to_user(clock, userID) do
+    user =
+      TimeManagerAPI.Repo.get!(TimeManagerAPI.User, userID) |> TimeManagerAPI.Repo.preload(:clock)
+
+    change_set = Ecto.Changeset.change(user, clock: clock)
+
+    case TimeManagerAPI.Repo.update(change_set) do
+      {:ok, _} -> {:ok, extract_clock_from_query(clock) |> Map.replace(:user, userID)}
+      {:error, _} -> {:error, "Error when updating"}
+    end
   end
 
   def init_clock(userID) do
     res =
-      TimeManagerAPI.Clocks.changeset(%TimeManagerAPI.Clocks{}, %{
-        user: userID,
-        time: NaiveDateTime.local_now(),
-        status: true
-      })
+      %TimeManagerAPI.Clock{
+        status: true,
+        time: NaiveDateTime.local_now()
+      }
       |> TimeManagerAPI.Repo.insert()
 
+    IO.inspect(res)
+
     case res do
-      {:ok, newclock} -> {:ok, extract_clock_from_query(newclock)}
-      {:error, _} -> {:error, "Error when creating a new clock"}
+      {:ok, newclock} ->
+        link_clock_to_user(newclock, userID)
+
+      {:error, _} ->
+        {:error, "Error when creating a new clock"}
     end
   end
 
   def query_clock_for_edition(userID) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Clocks,
-          where: u.user == ^userID,
-          select: [:id, :user, :status, :time],
-          limit: 1
-      )
+    query_user = TimeManagerAPI.Repo.get_by(TimeManagerAPI.Clock, user_id: userID)
 
-    if Enum.empty?(query) do
-      {:error, "Clock with for user with ID #{userID} not found"}
-    else
-      {:ok, query |> Enum.at(0)}
+    case query_user do
+      nil -> {:error, "No clock found"}
+      query_user -> {:ok, query_user}
     end
   end
 
-  def query_clock_from_id(userID) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Clocks,
-          where: u.user == ^userID,
-          select: [:id, :user, :status, :time],
-          limit: 1
-      )
+  def query_clock_from_user(user) do
+    # Users - has_one :clock, TimeManagerAPI.Clock
+    # Clocks - belongs_to :user, TimeManagerAPI.User
+    query = TimeManagerAPI.Repo.get_by(TimeManagerAPI.Clock, user_id: user.id)
 
-    if Enum.empty?(query) do
-      {:error, "Clock for user with id #{userID} not found"}
-    else
-      {:ok, extract_clock_from_query(query)}
+    IO.inspect(query)
+
+    case query do
+      nil -> {:error, "No clock found"}
+      query -> {:ok, extract_clock_from_query(query)}
     end
   end
 
   def show(conn, %{"userID" => userID} = _) do
-    case TimeManagerAPIWeb.UsersController.query_user_from_id(userID) do
-      {:ok, _} -> query_clock_from_id(userID)
-      {:error, msg} -> {:error, msg}
+    case TimeManagerAPIWeb.UsersController.query_user_for_edition(userID) do
+      {:ok, user} ->
+        IO.inspect(user)
+        query_clock_from_user(user)
+
+      {:error, msg} ->
+        {:error, msg}
     end
     |> render_json()
     |> send_response(conn)
@@ -102,7 +116,7 @@ defmodule TimeManagerAPIWeb.ClocksController do
     case TimeManagerAPIWeb.UsersController.query_user_from_id(userID) do
       {:ok, _} ->
         case query_clock_for_edition(userID) do
-          {:ok, clock} when clock.status == true -> stop_clock(clock)
+          {:ok, clock} when clock.status == true -> stop_clock(clock, userID)
           {:ok, clock} -> start_clock(clock)
           {:error, _} -> init_clock(userID)
         end

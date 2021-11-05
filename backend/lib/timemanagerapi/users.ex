@@ -1,10 +1,11 @@
-defmodule TimeManagerAPI.Users do
+defmodule TimeManagerAPI.User do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "users" do
-    field :email, :string
-    field :username, :string
+    field :email, :string, unique: true
+    field :username, :string, unique: true
+    has_one :clock, TimeManagerAPI.Clock
 
     timestamps()
   end

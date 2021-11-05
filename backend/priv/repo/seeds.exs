@@ -9,3 +9,13 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+  email: "a@b.c",
+  username: "a"
+})
+
+TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+  email: "b@b.c",
+  username: "b"
+})

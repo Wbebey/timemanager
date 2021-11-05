@@ -54,7 +54,7 @@ defmodule TimeManagerAPIWeb.Shared do
     %{
       id: head.id,
       status: head.status,
-      user: head.user,
+      user: head.user_id,
       time: head.time |> datetime_to_string()
     }
   end
@@ -63,7 +63,7 @@ defmodule TimeManagerAPIWeb.Shared do
     %{
       id: head.id,
       status: head.status,
-      user: head.user,
+      user: head.user_id,
       time: head.time |> datetime_to_string()
     }
   end
