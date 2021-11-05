@@ -105,6 +105,42 @@ defmodule TimeManagerAPIWeb.Shared do
     |> Enum.map(&extract_workingtime_from_query/1)
   end
 
+  def extract_team_from_query([head | tail]) when tail == [] do
+    %{
+      id: head.id,
+      name: head.name
+    }
+  end
+
+  def extract_team_from_query(elem) do
+    %{
+      id: elem.id,
+      name: elem.name
+    }
+  end
+
+  def extract_teams_from_query(elems) when is_list(elems) do
+    elems
+    |> Enum.map(&extract_team_from_query/1)
+  end
+
+  def add_user_to_team(team, user) do
+    team = team |> TimeManagerAPI.Repo.preload(:users)
+
+    changes =
+      team
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:users, [user | team.users])
+      |> TimeManagerAPI.Repo.update()
+
+    IO.inspect(changes)
+
+    case changes do
+      {:ok, team} -> {:ok, extract_team_from_query(team)}
+      {:error, _} -> {:error, "Error when updating team"}
+    end
+  end
+
   def render_json({:ok, elem}) do
     {200,
      Jason.encode(elem)

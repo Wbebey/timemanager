@@ -23,6 +23,26 @@ defmodule TimeManagerAPIWeb.Router do
       options("/:userID", UsersController, :options)
     end
 
+    scope "/teams" do
+      # create
+      post("/", TeamsController, :create)
+      # read
+      get("/:teamID", TeamsController, :show)
+      get("/", TeamsController, :show)
+      # rename team
+      put("/:teamID", TeamsController, :update)
+      # delete team
+      delete("/:teamID", TeamsController, :delete)
+      # add user to team
+      post("/:teamID/users/:userID", TeamsController, :add_user)
+      # get users in team
+      get("/:teamID/users", TeamsController, :get_users)
+      # get times in team
+      get("/:teamID/times", TeamsController, :get_times)
+      # remove user from team
+      delete("/:teamID/users/:userID", TeamsController, :remove_user)
+    end
+
     scope "/workingtimes" do
       # create
       post("/:userID", WorkingTimesController, :create)
@@ -31,7 +51,6 @@ defmodule TimeManagerAPIWeb.Router do
       get("/:userID", WorkingTimesController, :show)
       # Get specific timeframe
       get("/:id", WorkingTimesController, :show)
-      get("/team/:teamID", WorkingTimesController, :test)
       # update
       put("/:id", WorkingTimesController, :update)
       # delete

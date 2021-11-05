@@ -97,14 +97,14 @@ cop1_day_2 =
 
 cop2_day_1 =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.Workingtime{
-    user: cop1,
+    user: cop2,
     start: ~N[2021-11-02 09:53:16],
     end: ~N[2021-11-02 18:04:01]
   })
 
 cop2_day_2 =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.Workingtime{
-    user: cop1,
+    user: cop2,
     start: ~N[2021-11-02 09:59:18],
     end: ~N[2021-11-02 18:30:55]
   })
