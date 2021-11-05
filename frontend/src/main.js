@@ -9,6 +9,8 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  linkActiveClass: "active",
+  linkExactActiveClass: "exact-active",
   vuetify,
   icons: {
     iconfont: 'mdiSvg',
