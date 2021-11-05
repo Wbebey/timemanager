@@ -6,6 +6,7 @@ defmodule TimeManagerAPI.User do
     field :email, :string, unique: true
     field :username, :string, unique: true
     has_one :clock, TimeManagerAPI.Clock
+    has_many :times, TimeManagerAPI.Workingtime
 
     timestamps()
   end

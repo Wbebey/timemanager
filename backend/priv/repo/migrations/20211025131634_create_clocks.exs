@@ -5,7 +5,7 @@ defmodule TimeManagerAPI.Repo.Migrations.CreateClocks do
     create table(:clocks) do
       add :time, :naive_datetime, null: false
       add :status, :boolean, default: true, null: false
-      add :user_id, references(:users)
+      add :user_id, references(:users, on_delete: :nothing), null: false
 
       timestamps()
     end

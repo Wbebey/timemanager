@@ -73,7 +73,7 @@ defmodule TimeManagerAPIWeb.Shared do
       id: head.id,
       start: head.start |> datetime_to_string(),
       end: head.end |> datetime_to_string(),
-      user: head.user
+      user: head.user_id
     }
   end
 
@@ -82,11 +82,11 @@ defmodule TimeManagerAPIWeb.Shared do
       id: head.id,
       start: head.start |> datetime_to_string(),
       end: head.end |> datetime_to_string(),
-      user: head.user
+      user: head.user_id
     }
   end
 
-  def extract_workingtimes_from_query(elems) do
+  def extract_workingtimes_from_query(elems) when is_list(elems) do
     elems
     |> Enum.map(&extract_workingtime_from_query/1)
   end

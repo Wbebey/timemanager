@@ -5,27 +5,18 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   require Logger
 
   def query_times_from_id(id) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtimes,
-          where: u.id == ^id,
-          select: [:id, :user, :start, :end],
-          limit: 1
-      )
-
-    if Enum.empty?(query) do
-      {:error, "Working time with id #{id} not found"}
-    else
-      {:ok, extract_workingtimes_from_query(query)}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.Workingtime, id) do
+      nil -> {:error, "Working time with id #{id} not found"}
+      query -> {:ok, extract_workingtime_from_query(query)}
     end
   end
 
   def query_times_for_edition(id) do
     query =
       TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtimes,
+        from u in TimeManagerAPI.Workingtime,
           where: u.id == ^id,
-          select: [:id, :user, :start, :end],
+          select: [:id, :user_id, :start, :end],
           limit: 1
       )
 
@@ -37,15 +28,22 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def query_times_from_id_and_times(userID, {:ok, start}, {:ok, myend}) when myend >= start do
-    {:ok,
-     TimeManagerAPI.Repo.all(
-       from u in TimeManagerAPI.Workingtimes,
-         where: u.user == ^userID,
-         where: u.start >= ^start,
-         where: u.end <= ^myend,
-         select: u
-     )
-     |> extract_workingtimes_from_query()}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID) do
+      nil ->
+        {:error, "User with id #{userID} not found"}
+
+      _ ->
+        {:ok,
+         TimeManagerAPI.Repo.all(
+           from u in TimeManagerAPI.Workingtime,
+             where: u.user_id == ^userID,
+             where: u.start >= ^start,
+             where: u.end <= ^myend,
+             order_by: u.start,
+             select: u
+         )
+         |> extract_workingtimes_from_query()}
+    end
   end
 
   def query_times_from_id_and_times(_, {:ok, _}, {:ok, _}) do
@@ -61,33 +59,10 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def insert_times_in_db(userID, {:ok, start}, {:ok, myend}) when myend >= start do
-    IO.inspect(%{start: start, end: myend})
-    user = TimeManagerAPI.Repo.get(TimeManagerAPI.Users, userID)
-    {status, user} = TimeManagerAPIWeb.UsersController.query_user_from_id(userID)
-
-    case status do
-      :ok ->
-        to_insert = %{user: user.id, start: start, end: myend}
-
-        change_set =
-          TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, to_insert)
-
-        if !Enum.empty?(change_set.errors) do
-          {:error, "Error while inserting"}
-        else
-          case TimeManagerAPI.Repo.insert(change_set) do
-            {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
-            {:error, res} -> {:error, res}
-          end
-        end
-
-      :error ->
-        {:error, user}
-    end
+    insert_times_in_db(userID, start, myend)
   end
 
-  def insert_times_in_db(_, {:ok, l}, {:ok, r}) do
-    IO.inspect(%{start: l, end: r})
+  def insert_times_in_db(_, {:ok, _}, {:ok, _}) do
     {:error, "The start time is after the end time"}
   end
 
@@ -100,13 +75,13 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def insert_times_in_db(userID, start, myend) do
-    to_insert = %{user: userID, start: start, end: myend}
+    change_set =
+      %TimeManagerAPI.Workingtime{}
+      |> Ecto.Changeset.cast(%{user_id: userID}, [:user_id])
+      |> Ecto.Changeset.put_change(:start, start)
+      |> Ecto.Changeset.put_change(:end, myend)
 
-    change_set = TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, to_insert)
-
-    change_set.errors |> IO.inspect()
-    userID |> IO.inspect()
-    to_insert |> IO.inspect()
+    # = TimeManagerAPI.Workingtime.changeset(%TimeManagerAPI.Workingtime{}, to_insert)
 
     if !Enum.empty?(change_set.errors) do
       {:error, "Error while inserting"}

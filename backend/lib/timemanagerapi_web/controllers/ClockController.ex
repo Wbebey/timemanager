@@ -5,15 +5,10 @@ defmodule TimeManagerAPIWeb.ClocksController do
   require Logger
 
   def stop_clock(query, userID) do
-    clockin = query.time
-
-    IO.inspect("clockin")
-    IO.inspect(clockin)
-
     result_of_update =
       TimeManagerAPIWeb.WorkingTimesController.insert_times_in_db(
-        userID,
-        clockin,
+        TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID).id,
+        query.time,
         NaiveDateTime.local_now()
       )
 
@@ -37,7 +32,6 @@ defmodule TimeManagerAPIWeb.ClocksController do
   end
 
   def start_clock(query) do
-    IO.inspect("start_clock")
     change_clock(query, true)
   end
 
@@ -56,6 +50,7 @@ defmodule TimeManagerAPIWeb.ClocksController do
   def init_clock(userID) do
     res =
       %TimeManagerAPI.Clock{
+        user_id: TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID).id,
         status: true,
         time: NaiveDateTime.local_now()
       }
