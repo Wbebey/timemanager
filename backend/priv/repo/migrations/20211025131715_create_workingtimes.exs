@@ -6,8 +6,6 @@ defmodule TimeManagerAPI.Repo.Migrations.CreateWorkingtimes do
       add :start, :naive_datetime, null: false
       add :end, :naive_datetime, null: false
       add :user_id, references(:users, on_delete: :nothing), null: false
-
-      timestamps()
     end
   end
 end

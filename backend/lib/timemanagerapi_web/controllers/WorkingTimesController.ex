@@ -12,18 +12,9 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def query_times_for_edition(id) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtime,
-          where: u.id == ^id,
-          select: [:id, :user_id, :start, :end],
-          limit: 1
-      )
-
-    if Enum.empty?(query) do
-      {:error, "Working time with id #{id} not found"}
-    else
-      {:ok, query |> Enum.at(0)}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.Workingtime, id) do
+      nil -> {:error, "Working time with id #{id} not found"}
+      query -> {:ok, query}
     end
   end
 

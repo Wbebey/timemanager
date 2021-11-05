@@ -10,12 +10,65 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
-  email: "a@b.c",
-  username: "a"
-})
+root =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "admin@CGT-U.com",
+    username: "Admin",
+    role: :root
+  })
 
-TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
-  email: "b@b.c",
-  username: "b"
-})
+gardener_chief =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "gardener@gotham.city",
+    username: "Main gardener",
+    role: :manager
+  })
+
+gardener =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "jackson.mitchel@gotham.city",
+    username: "Jackson Mitchel"
+  })
+
+commisar =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "commisar@gcpd.com",
+    username: "Commisar of the Gotham City Police Department",
+    role: :manager
+  })
+
+cop1 =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "car1@gcpd.com",
+    username: "Car 1"
+  })
+
+cop2 =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
+    email: "car2@gcpd.com",
+    username: "Car 2"
+  })
+
+gardening_team =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.Team{
+    name: "Gardening team"
+  })
+  |> TimeManagerAPI.Repo.preload(:users)
+
+police =
+  TimeManagerAPI.Repo.insert!(%TimeManagerAPI.Team{
+    name: "Police Department"
+  })
+  |> TimeManagerAPI.Repo.preload(:users)
+
+gardening_team =
+  gardening_team
+  |> Ecto.Changeset.change()
+  |> Ecto.Changeset.put_assoc(:users, [root, gardener_chief, gardener])
+  |> TimeManagerAPI.Repo.update()
+
+police =
+  police
+  |> Ecto.Changeset.change()
+  |> Ecto.Changeset.put_assoc(:users, [root, commisar, cop1, cop2])
+  |> TimeManagerAPI.Repo.update()

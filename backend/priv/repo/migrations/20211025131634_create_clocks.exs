@@ -6,8 +6,6 @@ defmodule TimeManagerAPI.Repo.Migrations.CreateClocks do
       add :time, :naive_datetime, null: false
       add :status, :boolean, default: true, null: false
       add :user_id, references(:users, on_delete: :nothing), null: false
-
-      timestamps()
     end
   end
 end
