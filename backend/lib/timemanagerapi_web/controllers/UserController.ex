@@ -8,6 +8,29 @@ defmodule TimeManagerAPIWeb.UsersController do
     {:ok, TimeManagerAPI.Repo.all(TimeManagerAPI.User) |> extract_users_from_query}
   end
 
+  def query_teams_from_id(userID) do
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID) do
+      nil ->
+        {:error, "User with id #{userID} not found"}
+
+      user ->
+        {
+          :ok,
+          user
+          |> TimeManagerAPI.Repo.preload(:teams)
+          |> Map.get(:teams)
+          |> extract_teams_from_query
+        }
+    end
+  end
+
+  def query_user_from_role(role) when is_atom(role) do
+    case TimeManagerAPI.Repo.all(from u in TimeManagerAPI.User, where: u.role == ^role) do
+      [] -> {:ok, []}
+      users -> {:ok, extract_users_from_query(users)}
+    end
+  end
+
   def query_user_from_creds(username, email) do
     query = TimeManagerAPI.Repo.get_by(TimeManagerAPI.User, username: username, email: email)
 
@@ -70,6 +93,32 @@ defmodule TimeManagerAPIWeb.UsersController do
 
   def show_all(conn, _) do
     query_all_users()
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_teams(conn, %{"userID" => userID} = _) do
+    query_teams_from_id(userID)
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_teams(conn, _) do
+    {:error, "Missing parameters"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_by_role(conn, %{"role" => x} = _)
+      when x == "employe" or x == "manager" or x == "root" do
+    String.to_atom(x)
+    |> query_user_from_role()
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_by_role(conn, _) do
+    {:error, "Need a role, either 'employe', 'manager' or 'root'"}
     |> render_json()
     |> send_response(conn)
   end

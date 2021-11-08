@@ -35,6 +35,18 @@ defmodule TimeManagerAPIWeb.Router do
       # returns: User object
       get("/:userID", UsersController, :show)
 
+      # Get by role
+      # takes:
+      #   role: string, one of "root", "manager" or "employe"
+      # returns: array of User object
+      get("/management/:role", UsersController, :show_by_role)
+
+      # Get teams
+      # takes:
+      #   userID: integer
+      # returns: array of Team object
+      get("/:userID/teams", UsersController, :show_teams)
+
       ## update
       # Update user
       # takes:
