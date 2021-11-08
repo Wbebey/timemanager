@@ -1,34 +1,43 @@
 <template>
   <div>
-    <v-card elevation="2" class="d-inline-flex pa-2" outlined tile>
-      <v-list-item three-line>
-        <v-list-item-content>
-          <div class="text-overline mb-2">Cliquez pour commencer votre journée !</div>
-          <v-list-item-title class="text-h5 mb-2">
-            <a v-if="this.timeElapsed != null">{{ this.timeElapsed }}</a>
-            <a v-else> N/A </a>
-          </v-list-item-title>
-        </v-list-item-content>
-
+    <div class="button-clock-main">
+      <div class="text-clock-main">Cliquez pour commencer votre journée !</div>
+      <div class="text-clock-hour" v-if="this.clockIn">
         <v-btn
-          @click="createClock()"
-          class="btn btn-primary"
+          class="button-clock"
+          elevation="2"
           rounded
+          text
+          icon
           x-large
-          color="primary"
-          dark
+          color="white"
+          @click="createClock()"
+          ><v-icon dark size="50"> mdi-clock </v-icon></v-btn
         >
-          <div v-if="this.clockIn">stop time</div>
-          <div v-else><v-icon>mdi-alarm</v-icon> Start Timer</div>
-        </v-btn>
-      </v-list-item>
-
-      <!-- 
+      </div>
+      <div class="text-clock-hour" v-else>
+        <v-btn
+          class="button-clock-on"
+          elevation="2"
+          rounded
+          text
+          icon
+          x-large
+          color="white"
+          @click="createClock()"
+          ><v-icon dark size="50"> mdi-clock </v-icon></v-btn
+        >
+      </div>
+      <a class="text-clock-hour" v-if="this.timeElapsed != null">{{
+        this.timeElapsed
+      }}</a>
+      <a class="text-clock-hour" v-else> 0:00 </a>
+    </div>
+    <!-- 
     <button @click="createClock()" type="button" class="btn btn-primary">
       <div v-if="this.clockIn">Stop Timer</div>
       <div v-else>Start Timer</div>
     </button> -->
-    </v-card>
   </div>
 </template>
 
@@ -68,7 +77,7 @@ export default {
           this.clockIn = response.data.status;
         })
         .catch((error) => {
-          console.log("Error", error.message);
+          console.log("Error getClock", error.message);
           this.info = null;
         });
     },
@@ -92,19 +101,49 @@ export default {
 };
 </script>
 
-<style scoped>
-h3 {
-  margin: 40px 0 0;
+<style>
+
+.v-application a {
+    color: white;
+    text-align: center;
+    width: 100%;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.button-clock-main {
+  height: 40vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.text-clock-main {
+  width: 50%;
+  margin: auto;
+  height: 100px;
+  font-size: 1.5em;
+  text-align: center;
+  font-weight: bold;
 }
-a {
-  color: #42b983;
+
+.button-clock-on {
+  width: 50%;
+  background-color: #a24936;
+  margin: auto;
 }
+
+.button-clock-off {
+  width: 50%;
+  background-color: red;
+  margin: auto;
+}
+
+.text-clock-hour {
+  width: 50%;
+  margin: auto;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 </style>
