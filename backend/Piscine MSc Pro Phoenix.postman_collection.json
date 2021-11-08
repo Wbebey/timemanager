@@ -86,6 +86,34 @@
 					"response": []
 				},
 				{
+					"name": "GET Teams of user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/users/:userID/teams",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"users",
+								":userID",
+								"teams"
+							],
+							"variable": [
+								{
+									"key": "userID",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST New user",
 					"request": {
 						"method": "POST",
@@ -204,6 +232,34 @@
 								{
 									"key": "role",
 									"value": "employe"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Users by role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/api/users/management/:role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"users",
+								"management",
+								":role"
+							],
+							"variable": [
+								{
+									"key": "role",
+									"value": "manager"
 								}
 							]
 						}
