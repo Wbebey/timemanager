@@ -107,7 +107,6 @@ export default {
 </script>
 
 <style>
-
 .v-application .text-button {
     font-size: 1em !important;
     font-weight: 500;
