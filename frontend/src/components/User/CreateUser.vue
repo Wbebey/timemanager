@@ -1,69 +1,66 @@
 <template>
-  <div>
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          Create User
-        </v-card-title>
+  <v-card class="background-card">
+    <v-card-title> Créer un utilisateur </v-card-title>
+    <v-card-text>
+      <div class="card">
+        <div class="cardContent">
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+              v-model="username"
+              :counter="10"
+              :rules="usernameRules"
+              label="Username"
+              required
+            />
 
-        <v-card-text>
-          <div class="card">
-            <div class="cardContent">
-              <v-form ref="form" v-model="valid" lazy-validation>
-                <v-text-field
-                  v-model="username"
-                  :counter="10"
-                  :rules="usernameRules"
-                  label="Username"
-                  required
-                />
+            <v-text-field
+              v-model="email"
+              :rules="emailRules"
+              label="E-mail"
+              required
+            />
 
-                <v-text-field
-                  v-model="email"
-                  :rules="emailRules"
-                  label="E-mail"
-                  required
-                />
+            <v-text-field
+              v-model="password"
+              :rules="passwordRules"
+              label="Mot de passe"
+              required
+            />
 
-                <v-text-field
-                  v-model="password"
-                  :rules="passwordRules"
-                  label="Mot de passe"
-                  required
-                />
+            <v-select
+              v-model="role"
+              :items="rolePanel"
+              :rules="[(v) => !!v || 'Select permissions']"
+              label="Permissions"
+              outlined
+            ></v-select>
 
-                <v-select
-                  v-model="role"
-                  :items="rolePanel"
-                  :rules="[(v) => !!v || 'Select permissions']"
-                  label="Permissions"
-                  outlined
-                ></v-select>
+            <v-checkbox
+              v-model="checkbox"
+              :rules="[(v) => !!v || 'You must agree to continue!']"
+              label="Do you agree?"
+              color="success"
+              value="success"
+              required
+            ></v-checkbox>
 
-                <v-checkbox
-                  v-model="checkbox"
-                  :rules="[(v) => !!v || 'You must agree to continue!']"
-                  label="Do you agree?"
-                  required
-                ></v-checkbox>
+            <v-btn
+              :disabled="!valid"
+              color="success"
+              class="mr-7"
+              @click="validate"
+            >
+              Validate
+            </v-btn>
 
-                <v-btn
-                  :disabled="!valid"
-                  color="success"
-                  class="mr-7"
-                  @click="validate"
-                >
-                  Validate
-                </v-btn>
-
-                <v-btn color="error" class="mr-7" @click="reset">
-                  Reset Form
-                </v-btn>
-              </v-form>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
-  </div>
+            <v-btn color="error" class="mr-7" @click="reset">
+              Reset Form
+            </v-btn>
+          </v-form>
+        </div>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -126,6 +123,10 @@ export default {
 </script>
 
 <style scoped>
+.background-card {
+  background-color: #4c5c68;
+}
+
 .cardContent {
   display: flex;
   justify-content: center;

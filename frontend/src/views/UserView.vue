@@ -6,21 +6,11 @@
         <div class="title-user">Bienvenue Lucas Guyader</div>
       </div>
       <div class="button-clock-side">
-        <v-btn
-          class="button-clock-side-elem"
-          elevation="2"
-          rounded
-          text
-          x-large
-          color="white"
-          ><v-icon dark> mdi-wrench </v-icon></v-btn
-        >
+        <Button_Settings />
       </div>
       <clock />
       <div class="button-clock-second">
-        <v-btn class="button-employees" elevation="2" text rounded color="white"
-          >Employés</v-btn
-        >
+        <Button_Employees />
         <v-btn
           class="button-employees"
           elevation="2"
@@ -72,6 +62,8 @@
 //import Clock from "../components/ClockManager.vue";
 import logo from "../assets/logo.png";
 import Clock from "../components/ClockManager.vue";
+import Button_Employees from "../components/Button_Employees.vue";
+import Button_Settings from "../components/Button_Settings.vue";
 
 export default {
   name: "UserView",
@@ -116,6 +108,8 @@ export default {
   components: {
     //GetUser,
     Clock,
+    Button_Employees,
+    Button_Settings,
     //ShowWorkingTimes,
   },
   methods: {
@@ -170,6 +164,38 @@ export default {
 </script>
 
 <style>
+
+.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
+    border-bottom: thin solid rgba(0, 0, 0, 0.12);
+    color: white !important;
+    font-size: 1em;
+}
+
+.v-sheet.v-card {
+  border-radius: 0px !important;
+}
+
+.v-data-table {
+  border-radius: 0px !important;
+}
+
+.v-dialog {
+  border-radius: 20px;
+  margin: 24px;
+  overflow-y: auto;
+  pointer-events: auto;
+  transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 100%;
+  z-index: inherit;
+  box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%),
+    0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+}
+
+.theme--light.v-list {
+  background: #4c5c68 !important;
+  color: rgba(0, 0, 0, 0.87);
+}
+
 .v-list-item--dense .v-list-item__title,
 .v-list-item--dense .v-list-item__subtitle,
 .v-list--dense .v-list-item .v-list-item__title,

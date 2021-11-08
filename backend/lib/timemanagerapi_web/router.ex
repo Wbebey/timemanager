@@ -62,7 +62,7 @@ defmodule TimeManagerAPIWeb.Router do
       # for HTTP OPTIONS
       options("/", UsersController, :options)
       options("/:userID", UsersController, :options)
-      options("/:userID/promote", UsersController, :options)
+      options("/:userID/promote/:role", UsersController, :options)
     end
 
     scope "/teams" do

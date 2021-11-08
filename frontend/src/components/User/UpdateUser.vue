@@ -1,33 +1,81 @@
 <template>
-  <div>
-      <v-card elevation="2" class="d-inline-flex pa-2" outlined tile>
-      <v-text-field label="Adresse mail" class="mx-auto pa-6" v-model="email" />
-      <v-text-field label="User ID" class="mx-auto pa-6" v-model="userID" />
-      <v-text-field label="Nom d'utilisateur" class="mx-auto pa-6" v-model="username" />
-      <v-btn elevation="2" outlined color="accent" v-on:click="updateUser()"
-        >Update User</v-btn
-      >
-    </v-card>
-  </div>
+  <v-card class="background-card">
+    <v-card-title> Modification du compte </v-card-title>
+    <v-card-text>
+      <div class="card">
+        <div class="cardContent">
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+              v-model="username"
+              :counter="10"
+              :rules="usernameRules"
+              label="Username"
+              required
+            />
+
+            <v-text-field
+              v-model="email"
+              :rules="emailRules"
+              label="E-mail"
+              required
+            />
+
+            <v-text-field
+              v-model="password"
+              :rules="passwordRules"
+              label="Mot de passe"
+              required
+            />
+
+            <v-btn
+              :disabled="!valid"
+              color="success"
+              class="mr-7"
+              @click="validate"
+            >
+              Valider les changements
+            </v-btn>
+
+            <v-btn color="error" class="mr-7" @click="reset">
+              Reset Form
+            </v-btn>
+          </v-form>
+        </div>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
 import axios from "axios";
 
 export default {
-  name: 'UpdateUser',
+  name: "UpdateUser",
   data() {
     return {
-        username: null,
-        email: null,
-        userID: null,
+      valid: true,
+      username: "",
+      usernameRules: [
+        (v) => !!v || "Username is required",
+        (v) => (v && v.length <= 10) || "Name must be less than 10 characters",
+      ],
+      email: "",
+      emailRules: [
+        (v) => !!v || "E-mail is required",
+        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+      ],
+      password: "",
+      passwordRules: [
+        (v) => !!v || "Password is required",
+        (v) =>
+          (v && v.length >= 8) || "Password must be more than 8 characters",
+      ],
     };
   },
   methods: {
     updateUser() {
       axios
-        .put(`http://localhost:4000/api/users/${this.userID}/`,
-        {
+        .put(`http://localhost:4000/api/users/${this.userID}/`, {
           email: this.email,
           username: this.username,
         })
@@ -39,22 +87,12 @@ export default {
         });
     },
   },
-}
+};
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+.background-card {
+  background-color: #3E4C56;
 }
 </style>

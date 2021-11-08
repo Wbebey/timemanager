@@ -40,6 +40,16 @@
           @click="validate"
           ><div class="text-button">Connectez-vous</div></v-btn
         >
+        <v-btn
+          class="button-field"
+          elevation="2"
+          rounded
+          text
+          x-large
+          color="white"
+          @click="changeRoute()"
+          ><div class="text-button">Créer un compte</div></v-btn
+        >
       </div>
     </div>
   </div>
@@ -51,7 +61,7 @@ import background from "../assets/background.jpg";
 import logo from "../assets/logo.png";
 
 export default {
-  name: "Login",
+  name: "LogIn",
   data() {
     return {
       background,
@@ -78,7 +88,7 @@ export default {
     };
   },
   methods: {
-    createUser() {
+    GetUser() {
       //axios
       //  .post("http://localhost:4000/api/users/", {
       //    email: this.email,
@@ -94,13 +104,16 @@ export default {
     },
     validate() {
       //this.$refs.form.validate();
-      this.createUser();
+      this.GetUser();
     },
     reset() {
       this.$refs.form.reset();
     },
     resetValidation() {
       this.$refs.form.resetValidation();
+    },
+    changeRoute() {
+      this.$router.push("/register/");
     },
   },
 };
@@ -212,7 +225,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  margin-top: 5vh;
+  margin-top: 15vh;
 }
 
 .text-field {
@@ -225,6 +238,7 @@ export default {
 .button-field {
   width: 30%;
   margin: auto;
+  margin-top: 15px;
   background-color: #a24936;
 }
 

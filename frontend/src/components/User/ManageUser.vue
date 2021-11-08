@@ -10,7 +10,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in this.UserList" :key="user.userID">
+        <tr v-for="user in this.UserList" :key="user.id">
+          <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
@@ -91,7 +92,8 @@
                     depressed
                     color="green"
                     @click="
-                      updateUser();
+                      updateUser(userID);
+                      promoteUser(userID);
                       EditWindow = false;
                     "
                   >
@@ -110,7 +112,7 @@
               fab
               small
               @click="
-                ComfirmationWindow = true;
+                ConfirmationWindow = true;
                 deleteID = user.id;
               "
             >
@@ -118,7 +120,7 @@
             </v-btn>
 
             <v-dialog
-              v-model="ComfirmationWindow"
+              v-model="ConfirmationWindow"
               max-width="350"
               persistent
               :retain-focus="false"
@@ -135,7 +137,7 @@
                     class="mb-3"
                     depressed
                     color="grey"
-                    @click="ComfirmationWindow = false"
+                    @click="ConfirmationWindow = false"
                   >
                     Annuler
                   </v-btn>
@@ -146,7 +148,7 @@
                     color="red"
                     @click="
                       deleteUser();
-                      ComfirmationWindow = false;
+                      ConfirmationWindow = false;
                     "
                   >
                     Supprimer
@@ -168,10 +170,10 @@ export default {
   name: "ManageUser",
   data() {
     return {
-      ComfirmationWindow: false,
+      ConfirmationWindow: false,
       EditWindow: false,
 
-      UserList: null,
+      UserList: [],
       deleteID: null,
 
       valid: true,
@@ -187,8 +189,11 @@ export default {
         (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
       ],
       role: null,
-      rolePanel: ["Admin", "Manager", "User"],
+      rolePanel: ["root", "manager", "employe"],
     };
+  },
+  mounted() {
+    this.getUser();
   },
   methods: {
     getUser() {
@@ -202,9 +207,9 @@ export default {
           console.log("Error", error.message);
         });
     },
-    updateUser() {
+    updateUser(userID) {
       axios
-        .put(`http://localhost:4000/api/users/${this.userID}/`, {
+        .put(`http://localhost:4000/api/users/${userID}/`, {
           email: this.email,
           username: this.username,
         })
@@ -216,10 +221,26 @@ export default {
           console.log("Error", error.message);
         });
     },
+    promoteUser(userID) {
+      if (this.role != null) {
+        axios
+          .put(`http://localhost:4000/api/users/${userID}/promote/${this.role}`)
+          .then((response) => {
+            console.log(response.data);
+            console.log(this.role);
+            this.getUser();
+          })
+          .catch((error) => {
+            console.log("Error", error.message);
+            console.log(error.response.data);
+          });
+      }
+    },
     deleteUser() {
       axios
         .delete("http://localhost:4000/api/users/" + this.deleteID)
         .then((response) => {
+          console.log(this.deleteID);
           console.log(response.data);
           this.getUser();
         })
@@ -232,29 +253,25 @@ export default {
       console.log(this.deleteID);
     },
   },
-  mounted() {
-    this.getUser();
-  },
 };
 </script>
 
-<style scoped>
+<style>
+.v-data-table > .v-data-table__wrapper > table {
+  width: 100%;
+  height: 100%;
+  border-spacing: 0;
+}
+
 .list {
   width: 50vw;
   height: 80vh;
   display: flex;
   flex-direction: column;
+  color: white;
 }
 
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
+tr:hover td {
+  background-color: #3e4c56;
 }
 </style>
