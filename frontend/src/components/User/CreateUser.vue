@@ -1,48 +1,68 @@
 <template>
   <div>
-    <v-card elevation="2">
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <v-text-field
-          v-model="username"
-          :counter="10"
-          :rules="usernameRules"
-          label="Username"
-          required
-        ></v-text-field>
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          Create User
+        </v-card-title>
 
-        <v-text-field
-          v-model="email"
-          :rules="emailRules"
-          label="E-mail"
-          required
-        ></v-text-field>
+        <v-card-text>
+          <div class="card">
+            <div class="cardContent">
+              <v-form ref="form" v-model="valid" lazy-validation>
+                <v-text-field
+                  v-model="username"
+                  :counter="10"
+                  :rules="usernameRules"
+                  label="Username"
+                  required
+                />
 
-        <v-text-field
-          v-model="password"
-          :rules="passwordRules"
-          label="Mot de passe"
-          required
-        ></v-text-field>
+                <v-text-field
+                  v-model="email"
+                  :rules="emailRules"
+                  label="E-mail"
+                  required
+                />
 
-        <v-checkbox
-          v-model="checkbox"
-          :rules="[(v) => !!v || 'You must agree to continue!']"
-          label="Do you agree?"
-          required
-        ></v-checkbox>
+                <v-text-field
+                  v-model="password"
+                  :rules="passwordRules"
+                  label="Mot de passe"
+                  required
+                />
 
-        <v-btn
-          :disabled="!valid"
-          color="success"
-          class="mr-4"
-          @click="validate"
-        >
-          Validate
-        </v-btn>
+                <v-select
+                  v-model="role"
+                  :items="rolePanel"
+                  :rules="[(v) => !!v || 'Select permissions']"
+                  label="Permissions"
+                  outlined
+                ></v-select>
 
-        <v-btn color="error" class="mr-4" @click="reset"> Reset Form </v-btn>
-      </v-form>
-    </v-card>
+                <v-checkbox
+                  v-model="checkbox"
+                  :rules="[(v) => !!v || 'You must agree to continue!']"
+                  label="Do you agree?"
+                  required
+                ></v-checkbox>
+
+                <v-btn
+                  :disabled="!valid"
+                  color="success"
+                  class="mr-7"
+                  @click="validate"
+                >
+                  Validate
+                </v-btn>
+
+                <v-btn color="error" class="mr-7" @click="reset">
+                  Reset Form
+                </v-btn>
+              </v-form>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
   </div>
 </template>
 
@@ -58,7 +78,7 @@ export default {
       username: "",
       usernameRules: [
         (v) => !!v || "Username is required",
-        (v) => (v && v.length <= 5) || "Name must be less than 5 characters",
+        (v) => (v && v.length <= 10) || "Name must be less than 10 characters",
       ],
       email: "",
       emailRules: [
@@ -69,8 +89,10 @@ export default {
       passwordRules: [
         (v) => !!v || "Password is required",
         (v) =>
-          (v && v.length <= 8) || "Password must be less than 8 characters",
+          (v && v.length >= 8) || "Password must be more than 8 characters",
       ],
+      role: "",
+      rolePanel: ["Admin", "Manager", "User"],
       checkbox: false,
     };
   },
@@ -104,18 +126,15 @@ export default {
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.cardContent {
+  display: flex;
+  justify-content: center;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: 100vh;
 }
 </style>

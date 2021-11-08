@@ -3,24 +3,38 @@
     <v-card elevation="2" class="d-inline-flex pa-2" outlined tile>
       <v-list-item three-line>
         <v-list-item-content>
-          <div class="text-overline mb-2">Cliquez pour commencer votre journée !</div>
+          <div class="text-overline mb-2">
+            Cliquez pour commencer votre journée !
+          </div>
           <v-list-item-title class="text-h5 mb-2">
             <a v-if="this.timeElapsed != null">{{ this.timeElapsed }}</a>
             <a v-else> N/A </a>
           </v-list-item-title>
         </v-list-item-content>
-
-        <v-btn
-          @click="createClock()"
-          class="btn btn-primary"
-          rounded
-          x-large
-          color="primary"
-          dark
-        >
-          <div v-if="this.clockIn">stop time</div>
-          <div v-else><v-icon>mdi-alarm</v-icon> Start Timer</div>
-        </v-btn>
+        <div v-if="this.clockIn">
+          <v-btn
+            class="timer_btn"
+            @click="createClock()"
+            color="success"
+            fab
+            large
+            dark
+          >
+            <v-icon>mdi-alarm</v-icon>
+          </v-btn>
+        </div>
+        <div v-else>
+          <v-btn
+            class="timer_btn"
+            @click="createClock()"
+            color="error"
+            fab
+            large
+            dark
+          >
+            <v-icon>mdi-alarm</v-icon>
+          </v-btn>
+        </div>
       </v-list-item>
 
       <!-- 
@@ -31,6 +45,7 @@
     </v-card>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";

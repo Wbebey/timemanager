@@ -43,15 +43,20 @@
         <v-btn color="error" class="mr-4" @click="reset"> Reset Form </v-btn>
       </v-form>
     </div>
+    <popup />
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Popup from "../components/Popup.vue";
 //import { createCookie } from "../../cookie"
 
 export default {
   name: "Register",
+  components: {
+    Popup
+  },
   data() {
     return {
       valid: true,
