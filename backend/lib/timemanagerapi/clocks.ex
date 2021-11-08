@@ -6,8 +6,6 @@ defmodule TimeManagerAPI.Clock do
     field :status, :boolean, default: false
     field :time, :naive_datetime
     belongs_to :user, TimeManagerAPI.User
-
-    timestamps()
   end
 
   @doc false
