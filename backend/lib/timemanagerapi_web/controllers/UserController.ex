@@ -4,6 +4,10 @@ defmodule TimeManagerAPIWeb.UsersController do
   import Ecto.Query
   require Logger
 
+  def query_all_users() do
+    {:ok, TimeManagerAPI.Repo.all(TimeManagerAPI.User) |> extract_users_from_query}
+  end
+
   def query_user_from_creds(username, email) do
     query = TimeManagerAPI.Repo.get_by(TimeManagerAPI.User, username: username, email: email)
 
@@ -59,7 +63,14 @@ defmodule TimeManagerAPIWeb.UsersController do
   end
 
   def show(conn, _) do
-    render_json({:error, "Bad request: no id nor username/email combo"})
+    {:error, "Missing parameters"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_all(conn, _) do
+    query_all_users()
+    |> render_json()
     |> send_response(conn)
   end
 

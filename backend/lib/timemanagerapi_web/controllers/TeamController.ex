@@ -43,7 +43,7 @@ defmodule TimeManagerAPIWeb.TeamsController do
   # returns either a {:ok, message} or a {:error, message}
   def delete_team(team) do
     case TimeManagerAPI.Repo.delete(team) do
-      {:ok, _} -> {:ok, "Team #{team.name} deleted"}
+      {:ok, _} -> {:ok, %{message: "Team #{team.name} deleted"}}
       {:error, _} -> {:error, "Error when deleting team"}
     end
   end

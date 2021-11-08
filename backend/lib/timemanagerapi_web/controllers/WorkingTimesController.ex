@@ -139,14 +139,21 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     |> send_response(conn)
   end
 
-  def show(conn, %{"userID" => id} = _) do
+  def show(conn, _) do
+    {:error, "Missing parameters"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_specific_time(conn, %{"id" => id} = _) do
     query_times_from_id(id)
     |> render_json()
     |> send_response(conn)
   end
 
-  def show(conn, _) do
-    render_json({:error, "Invalid arguments"})
+  def show_specific_time(conn, _) do
+    {:error, "Invalid arguments"}
+    |> render_json()
     |> send_response(conn)
   end
 
