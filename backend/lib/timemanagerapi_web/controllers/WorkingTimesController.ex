@@ -5,47 +5,40 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   require Logger
 
   def query_times_from_id(id) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtimes,
-          where: u.id == ^id,
-          select: [:id, :user, :start, :end],
-          limit: 1
-      )
-
-    if Enum.empty?(query) do
-      {:error, "Working time with id #{id} not found"}
-    else
-      {:ok, extract_workingtimes_from_query(query)}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.Workingtime, id) do
+      nil -> {:error, "Working time with id #{id} not found"}
+      query -> {:ok, extract_workingtime_from_query(query)}
     end
   end
 
   def query_times_for_edition(id) do
-    query =
-      TimeManagerAPI.Repo.all(
-        from u in TimeManagerAPI.Workingtimes,
-          where: u.id == ^id,
-          select: [:id, :user, :start, :end],
-          limit: 1
-      )
-
-    if Enum.empty?(query) do
-      {:error, "Working time with id #{id} not found"}
-    else
-      {:ok, query |> Enum.at(0)}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.Workingtime, id) do
+      nil -> {:error, "Working time with id #{id} not found"}
+      query -> {:ok, query}
     end
   end
 
+  def get_workingtimes_of_team(nil) do
+    {:error, "Team not found"}
+  end
+
   def query_times_from_id_and_times(userID, {:ok, start}, {:ok, myend}) when myend >= start do
-    {:ok,
-     TimeManagerAPI.Repo.all(
-       from u in TimeManagerAPI.Workingtimes,
-         where: u.user == ^userID,
-         where: u.start >= ^start,
-         where: u.end <= ^myend,
-         select: u
-     )
-     |> extract_workingtimes_from_query()}
+    case TimeManagerAPI.Repo.get(TimeManagerAPI.User, userID) do
+      nil ->
+        {:error, "User with id #{userID} not found"}
+
+      _ ->
+        {:ok,
+         TimeManagerAPI.Repo.all(
+           from u in TimeManagerAPI.Workingtime,
+             where: u.user_id == ^userID,
+             where: u.start >= ^start,
+             where: u.end <= ^myend,
+             order_by: u.start,
+             select: u
+         )
+         |> extract_workingtimes_from_query()}
+    end
   end
 
   def query_times_from_id_and_times(_, {:ok, _}, {:ok, _}) do
@@ -61,27 +54,7 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
   end
 
   def insert_times_in_db(userID, {:ok, start}, {:ok, myend}) when myend >= start do
-    {status, user} = TimeManagerAPIWeb.UsersController.query_user_from_id(userID)
-
-    case status do
-      :ok ->
-        to_insert = %{user: user.id, start: start, end: myend}
-
-        change_set =
-          TimeManagerAPI.Workingtimes.changeset(%TimeManagerAPI.Workingtimes{}, to_insert)
-
-        if !Enum.empty?(change_set.errors) do
-          {:error, "Error while inserting"}
-        else
-          case TimeManagerAPI.Repo.insert(change_set) do
-            {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
-            {:error, res} -> {:error, res}
-          end
-        end
-
-      :error ->
-        {:error, user}
-    end
+    insert_times_in_db(userID, start, myend)
   end
 
   def insert_times_in_db(_, {:ok, _}, {:ok, _}) do
@@ -94,6 +67,25 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
 
   def insert_times_in_db(_, {f, _}, {:error, msg}) when is_atom(f) do
     {:error, msg}
+  end
+
+  def insert_times_in_db(userID, start, myend) do
+    change_set =
+      %TimeManagerAPI.Workingtime{}
+      |> Ecto.Changeset.cast(%{user_id: userID}, [:user_id])
+      |> Ecto.Changeset.put_change(:start, start)
+      |> Ecto.Changeset.put_change(:end, myend)
+
+    # = TimeManagerAPI.Workingtime.changeset(%TimeManagerAPI.Workingtime{}, to_insert)
+
+    if !Enum.empty?(change_set.errors) do
+      {:error, "Error while inserting"}
+    else
+      case TimeManagerAPI.Repo.insert(change_set) do
+        {:ok, res} -> {:ok, extract_workingtime_from_query(res)}
+        {:error, res} -> {:error, res}
+      end
+    end
   end
 
   def update_time_in_db({:ok, target}, {:ok, start}, {:ok, myend}) when myend >= start do
@@ -147,14 +139,21 @@ defmodule TimeManagerAPIWeb.WorkingTimesController do
     |> send_response(conn)
   end
 
-  def show(conn, %{"userID" => id} = _) do
+  def show(conn, _) do
+    {:error, "Missing parameters"}
+    |> render_json()
+    |> send_response(conn)
+  end
+
+  def show_specific_time(conn, %{"id" => id} = _) do
     query_times_from_id(id)
     |> render_json()
     |> send_response(conn)
   end
 
-  def show(conn, _) do
-    render_json({:error, "Invalid arguments"})
+  def show_specific_time(conn, _) do
+    {:error, "Invalid arguments"}
+    |> render_json()
     |> send_response(conn)
   end
 
