@@ -25,7 +25,7 @@
               small
               @click="
                 EditWindow = true;
-                userID = user.userID;
+                userID = user.id;
                 username = user.username;
                 email = user.email;
                 role = user.role;
@@ -111,7 +111,7 @@
               small
               @click="
                 ComfirmationWindow = true;
-                deleteID = user.userID;
+                deleteID = user.id;
               "
             >
               <v-icon>mdi-trash-can-outline </v-icon>
@@ -171,34 +171,7 @@ export default {
       ComfirmationWindow: false,
       EditWindow: false,
 
-      UserList: [
-        {
-          userID: 1,
-          username: "jojo1",
-          email: "dede1@gmail.com",
-          role: "Admin",
-        },
-        {
-          userID: 2,
-          username: "jojo2",
-          email: "dede2@gmail.com",
-          role: "User",
-          userManager:"jojo3"
-        },
-        {
-          userID: 3,
-          username: "jojo3",
-          email: "dede3@gmail.com",
-          role: "Manager",
-        },
-        {
-          userID: 4,
-          username: "jojo4",
-          email: "dede4@gmail.com",
-          role: "User",
-          userManager:"jojo3"
-        },
-      ],
+      UserList: null,
       deleteID: null,
 
       valid: true,
@@ -223,7 +196,7 @@ export default {
         .get("http://localhost:4000/api/users")
         .then((response) => {
           console.log(response.data);
-          // this.UserList = response.data
+          this.UserList = response.data;
         })
         .catch((error) => {
           console.log("Error", error.message);
@@ -237,6 +210,7 @@ export default {
         })
         .then((response) => {
           console.log(response.data);
+          this.getUser();
         })
         .catch((error) => {
           console.log("Error", error.message);
@@ -247,6 +221,7 @@ export default {
         .delete("http://localhost:4000/api/users/" + this.deleteID)
         .then((response) => {
           console.log(response.data);
+          this.getUser();
         })
         .catch((error) => {
           console.log("Error", error.message);
@@ -256,6 +231,9 @@ export default {
     test() {
       console.log(this.deleteID);
     },
+  },
+  mounted() {
+    this.getUser();
   },
 };
 </script>
