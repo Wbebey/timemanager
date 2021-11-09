@@ -141,14 +141,14 @@ defmodule TimeManagerAPIWeb.Shared do
 
   def render_json({:ok, elem}) do
     {200,
-     Jason.encode(elem)
-     |> elem(1)}
+    Jason.encode(elem)
+    |> elem(1)}
   end
 
   def render_json({:error, message}) do
     {400,
-     Jason.encode(%{message: message})
-     |> elem(1)}
+    Jason.encode(%{message: message})
+    |> elem(1)}
   end
 
   def send_response({status, content}, conn) do

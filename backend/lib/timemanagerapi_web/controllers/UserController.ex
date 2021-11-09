@@ -123,12 +123,12 @@ defmodule TimeManagerAPIWeb.UsersController do
     |> send_response(conn)
   end
 
-  def insert_user_in_db({:ok, {username, email}}) do
-    to_insert = %{username: username, email: email}
+  def insert_user_in_db({:ok, {username, email}}, password, password_confirmation) do
+    to_insert = %{username: username, email: email, password: password, password_confirmation: password_confirmation}
     change_set = TimeManagerAPI.User.changeset(%TimeManagerAPI.User{}, to_insert)
 
     if !Enum.empty?(change_set.errors) do
-      {:error, "Invalid format for the email"}
+      {:error, "Invalid format for the email or password"}
     else
       case TimeManagerAPI.Repo.insert(change_set) do
         {:ok, res} -> {:ok, extract_user_from_query(res)}
@@ -137,16 +137,18 @@ defmodule TimeManagerAPIWeb.UsersController do
     end
   end
 
-  def insert_user_in_db({:error, message}) do
+  def insert_user_in_db({:error, message}, _, _) do
     {:error, message}
   end
 
-  def create(conn, %{"email" => email, "username" => username} = _) do
+  def create(conn, %{"email" => email, "username" => username, "password" => password, "password_confirmation" => password_confirmation} = _) do
     query_user_for_duplicates(username, email)
-    |> insert_user_in_db()
+    # |> salt_password(password)
+    |> insert_user_in_db(password, password_confirmation)
     |> render_json()
     |> send_response(conn)
   end
+
 
   def create(conn, _) do
     render_json({:error, "Invalid arguments"})

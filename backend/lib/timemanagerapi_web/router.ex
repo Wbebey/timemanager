@@ -8,74 +8,76 @@ defmodule TimeManagerAPIWeb.Router do
 
   scope "/api", TimeManagerAPIWeb do
     pipe_through(:api)
-    resources "/users", UserController, only: [:create, :show]
-    # scope "/users" do
-    #   ## Object definitions: User
-    #   # id: integer
-    #   # name: string
-    #   # email: string in format ~r/.+@.+\..+/
-    #   # role: string, one of "root", "manager" or "employe"
 
-    #   ## create
-    #   # Create user
-    #   # takes:
-    #   #   name: string
-    #   #   email: string in format ~r/.+@.+\..+/
-    #   # returns: User object
-    #   post("/", UsersController, :create)
+    # resources "/users", UserController, only: [:create, :show]
 
-    #   ## read
-    #   # Get all users
-    #   # returns: array of User objects
-    #   get("/", UsersController, :show_all)
+    scope "/users" do
+      ## Object definitions: User
+      # id: integer
+      # name: string
+      # email: string in format ~r/.+@.+\..+/
+      # role: string, one of "root", "manager" or "employe"
 
-    #   # Get user by id
-    #   # takes:
-    #   #   userID: integer
-    #   # returns: User object
-    #   get("/:userID", UsersController, :show)
+      ## create
+      # Create user
+      # takes:
+      #   name: string
+      #   email: string in format ~r/.+@.+\..+/
+      # returns: User object
+      post("/", UsersController, :create)
 
-    #   # Get by role
-    #   # takes:
-    #   #   role: string, one of "root", "manager" or "employe"
-    #   # returns: array of User object
-    #   get("/management/:role", UsersController, :show_by_role)
+      ## read
+      # Get all users
+      # returns: array of User objects
+      get("/", UsersController, :show_all)
 
-    #   # Get teams
-    #   # takes:
-    #   #   userID: integer
-    #   # returns: array of Team object
-    #   get("/:userID/teams", UsersController, :show_teams)
+      # Get user by id
+      # takes:
+      #   userID: integer
+      # returns: User object
+      get("/:userID", UsersController, :show)
 
-    #   ## update
-    #   # Update user
-    #   # takes:
-    #   #  userID: integer
-    #   #  name: string
-    #   #  email: string in format ~r/.+@.+\..+/
-    #   # returns: User object
-    #   put("/:userID", UsersController, :update)
+      # Get by role
+      # takes:
+      #   role: string, one of "root", "manager" or "employe"
+      # returns: array of User object
+      get("/management/:role", UsersController, :show_by_role)
 
-    #   # Promote
-    #   # takes:
-    #   #  userID: integer
-    #   #  role: string, one of "root", "manager" or "employe"
-    #   # returns: User object
-    #   put("/:userID/promote/:role", UsersController, :promote)
+      # Get teams
+      # takes:
+      #   userID: integer
+      # returns: array of Team object
+      get("/:userID/teams", UsersController, :show_teams)
 
-    #   ## delete
-    #   # Delete user
-    #   # takes:
-    #   #   userID: integer
-    #   # returns: a json object of format {"message": message}
-    #   delete("/:userID", UsersController, :delete)
+      ## update
+      # Update user
+      # takes:
+      #  userID: integer
+      #  name: string
+      #  email: string in format ~r/.+@.+\..+/
+      # returns: User object
+      put("/:userID", UsersController, :update)
 
-    #   ## options
-    #   # for HTTP OPTIONS
-    #   options("/", UsersController, :options)
-    #   options("/:userID", UsersController, :options)
-    #   options("/:userID/promote/:role", UsersController, :options)
-    # end
+      # Promote
+      # takes:
+      #  userID: integer
+      #  role: string, one of "root", "manager" or "employe"
+      # returns: User object
+      put("/:userID/promote/:role", UsersController, :promote)
+
+      ## delete
+      # Delete user
+      # takes:
+      #   userID: integer
+      # returns: a json object of format {"message": message}
+      delete("/:userID", UsersController, :delete)
+
+      ## options
+      # for HTTP OPTIONS
+      options("/", UsersController, :options)
+      options("/:userID", UsersController, :options)
+      options("/:userID/promote/:role", UsersController, :options)
+    end
 
     scope "/teams" do
       ## Object definitions: Team
