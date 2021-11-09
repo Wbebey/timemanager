@@ -24,21 +24,23 @@
     </div>
     <div class="calendar-side">
       <div class="header-calendar-size">
-        <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <v-select
-          v-model="type"
-          :items="types"
-          dense
-          outlined
-          hide-details
-          class="ma-2"
-          label="type"
-        ></v-select>
-        <v-btn icon class="ma-2" @click="$refs.calendar.next()">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
+          <v-btn icon @click="$refs.calendar.prev()">
+            <v-icon color="white">mdi-chevron-left</v-icon>
+          </v-btn>
+          <div class="v-select-calendar">
+          <v-select
+            v-model="type"
+            :items="types"
+            dense
+            outlined
+            color="white"
+            hide-details
+            label="type"
+          ></v-select>
+          </div>
+          <v-btn icon @click="$refs.calendar.next()">
+            <v-icon color="white">mdi-chevron-right</v-icon>
+          </v-btn>
       </div>
       <div class="calendar">
         <v-calendar
@@ -64,6 +66,7 @@ import logo from "../assets/logo.png";
 import Clock from "../components/ClockManager.vue";
 import Button_Employees from "../components/Button_Employees.vue";
 import Button_Settings from "../components/Button_Settings.vue";
+import store from "../store"
 
 export default {
   name: "UserView",
@@ -101,16 +104,16 @@ export default {
       ],
       logo,
       userId: this.$route.params.userId,
-      username: null,
-      email: null,
     };
   },
   components: {
-    //GetUser,
     Clock,
     Button_Employees,
     Button_Settings,
     //ShowWorkingTimes,
+  },
+  mounted() {
+    store.commit("getAll");
   },
   methods: {
     deconnection() {
@@ -164,11 +167,15 @@ export default {
 </script>
 
 <style>
-
-.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
-    border-bottom: thin solid rgba(0, 0, 0, 0.12);
-    color: white !important;
-    font-size: 1em;
+.theme--light.v-data-table
+  > .v-data-table__wrapper
+  > table
+  > thead
+  > tr:last-child
+  > th {
+  border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  color: white !important;
+  font-size: 1em;
 }
 
 .v-sheet.v-card {
@@ -284,9 +291,10 @@ export default {
 }
 
 .button-employees {
-  width: 50%;
+  width: 60%;
   margin: auto;
   background-color: #a24936;
+  font-weight: bold;
 }
 
 .header-calendar-size {
@@ -308,4 +316,16 @@ export default {
   width: 100%;
   height: 85vh;
 }
+
+.v-list-item--dense .v-list-item__title,
+.v-list-item--dense .v-list-item__subtitle,
+.v-list--dense .v-list-item .v-list-item__title,
+.v-list--dense .v-list-item .v-list-item__subtitle {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1rem;
+  color: white !important;
+  font-weight: bold;
+}
+
 </style>

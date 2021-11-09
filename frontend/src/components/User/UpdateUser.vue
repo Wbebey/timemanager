@@ -6,7 +6,7 @@
         <div class="cardContent">
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
-              v-model="username"
+              v-model="user.username"
               :counter="10"
               :rules="usernameRules"
               label="Username"
@@ -14,16 +14,9 @@
             />
 
             <v-text-field
-              v-model="email"
+              v-model="user.email"
               :rules="emailRules"
               label="E-mail"
-              required
-            />
-
-            <v-text-field
-              v-model="password"
-              :rules="passwordRules"
-              label="Mot de passe"
               required
             />
 
@@ -36,9 +29,57 @@
               Valider les changements
             </v-btn>
 
-            <v-btn color="error" class="mr-7" @click="reset">
-              Reset Form
+            <v-btn
+              class="my-2"
+              color="error"
+              outlined
+              fab
+              small
+              @click="
+                ConfirmationWindow = true;
+                deleteID = user.id;
+              "
+            >
+              <v-icon>mdi-trash-can-outline </v-icon>
             </v-btn>
+
+            <v-dialog
+              v-model="ConfirmationWindow"
+              max-width="350"
+              persistent
+              :retain-focus="false"
+            >
+              <v-card class="blue-grey darken-2">
+                <v-card-title class="text-h5">
+                  Etes-vous sur(e) de vouloir supprimer votre compte
+                  ?</v-card-title
+                >
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="grey"
+                    @click="ConfirmationWindow = false"
+                  >
+                    Annuler
+                  </v-btn>
+
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="red"
+                    @click="
+                      deleteUser();
+                      ConfirmationWindow = false;
+                    "
+                  >
+                    Supprimer
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-form>
         </div>
       </div>
@@ -53,7 +94,10 @@ export default {
   name: "UpdateUser",
   data() {
     return {
+      user: [],
       valid: true,
+      userID: this.$route.params.userId,
+      ConfirmationWindow: false,
       username: "",
       usernameRules: [
         (v) => !!v || "Username is required",
@@ -72,18 +116,50 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.getUser();
+  },
   methods: {
-    updateUser() {
+    getUser() {
       axios
-        .put(`http://localhost:4000/api/users/${this.userID}/`, {
-          email: this.email,
-          username: this.username,
-        })
+        .get(`http://localhost:4000/api/users/${this.userID}`)
         .then((response) => {
           console.log(response.data);
+          this.user = response.data;
         })
         .catch((error) => {
           console.log("Error", error.message);
+        });
+    },
+    validate() {
+      //this.$refs.form.validate();
+      this.updateUser();
+    },
+    updateUser() {
+      axios
+        .put(`http://localhost:4000/api/users/${this.userID}/`, {
+          email: this.user.email,
+          username: this.user.username,
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.getUser();
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
+        });
+    },
+    deleteUser() {
+      axios
+        .delete("http://localhost:4000/api/users/" + this.deleteID)
+        .then((response) => {
+          console.log(this.deleteID);
+          console.log(response.data);
+          this.getUser();
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
+          this.info = null;
         });
     },
   },
@@ -91,8 +167,7 @@ export default {
 </script>
 
 <style scoped>
-
 .background-card {
-  background-color: #3E4C56;
+  background-color: #3e4c56;
 }
 </style>

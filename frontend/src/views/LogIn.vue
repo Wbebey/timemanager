@@ -59,6 +59,7 @@
 //import axios from "axios";
 import background from "../assets/background.jpg";
 import logo from "../assets/logo.png";
+import store from "../store";
 
 export default {
   name: "LogIn",
@@ -96,6 +97,7 @@ export default {
       //  })
       //  .then((response) => {
       //    console.log(response.data);
+          store.commit('setId', 1);
           this.$router.push("/user/" + "1");
       //  })
       //  .catch((error) => {

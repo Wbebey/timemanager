@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in this.UserList" :key="user.id">
+        <tr v-for="user in orderedUsers" :key="user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
@@ -166,8 +166,15 @@
 <script>
 import axios from "axios";
 
+var _ = require('lodash');
+
 export default {
   name: "ManageUser",
+  computed: {
+    orderedUsers: function () {
+      return _.orderBy(this.UserList, "id");
+    },
+  },
   data() {
     return {
       ConfirmationWindow: false,
