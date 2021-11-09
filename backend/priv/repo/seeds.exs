@@ -16,39 +16,46 @@ root =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "admin@CGT-U.com",
     username: "Admin",
-    role: :root
+    role: :root,
+    password: Bcrypt.hash_pwd_salt("root")
   })
 
 gardener_chief =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "gardener@gotham.city",
     username: "Main gardener",
-    role: :manager
+    role: :manager,
+    password: Bcrypt.hash_pwd_salt("gardener_chief")
   })
+
 
 gardener =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "jackson.mitchel@gotham.city",
-    username: "Jackson Mitchel"
+    username: "Jackson Mitchel",
+    password: Bcrypt.hash_pwd_salt("gardener")
   })
 
 commisar =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "commisar@gcpd.com",
     username: "Commisar of the Gotham City Police Department",
-    role: :manager
+    role: :manager,
+    password: Bcrypt.hash_pwd_salt("commisar")
   })
 
 cop1 =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "car1@gcpd.com",
-    username: "Car 1"
+    username: "Car 1",
+    password: Bcrypt.hash_pwd_salt("cop1")
   })
 
 cop2 =
   TimeManagerAPI.Repo.insert!(%TimeManagerAPI.User{
     email: "car2@gcpd.com",
-    username: "Car 2"
+    username: "Car 2",
+    password: Bcrypt.hash_pwd_salt("cop2")
   })
 
 ### TEAMS ###
