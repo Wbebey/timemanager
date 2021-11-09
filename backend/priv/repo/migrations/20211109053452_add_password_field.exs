@@ -3,7 +3,7 @@ defmodule TimeManagerAPI.Repo.Migrations.AddPasswordField do
 
   def change do
     alter table(:users) do
-      add :password_hash, :string 
+      add :password, :string
     end
   end
 end

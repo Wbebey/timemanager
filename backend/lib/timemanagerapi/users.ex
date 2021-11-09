@@ -6,9 +6,8 @@ defmodule TimeManagerAPI.User do
     # User infos
     field :email, :string, unique: true
     field :username, :string, unique: true
-    field :password_hash, :string
-    field :password, :string, virtual: true
-    field :password_confirmation, :string, virtual: true
+    field :password, :string
+    field :password_hash, :string, virtual: true
 
     # Time management
     has_one :clock, TimeManagerAPI.Clock
@@ -23,20 +22,18 @@ defmodule TimeManagerAPI.User do
   @doc false
   def changeset(users, attrs) do
     users
-    |> cast(attrs, [:username, :email, :role, :password, :password_confirmation])
-    |> validate_required([:username, :email, :role, :password, :password_confirmation])
+    |> cast(attrs, [:username, :email, :role, :password_hash])
+    |> validate_required([:username, :email, :role, :password_hash])
     |> validate_format(:email, ~r/.+@.+\..+/)
-    |> validate_length(:password, min: 2)
-    |> validate_confirmation(:password)
-    # |> unique_constraint(:email)
+    |> validate_length(:password_hash, min: 2)
     |> put_password_hash
   end
 
   defp put_password_hash(changeset) do
     case changeset do
-      %Ecto.Changeset{valid?: true, changes: %{password: pass}}
+      %Ecto.Changeset{valid?: true, changes: %{password_hash: pass}}
         ->
-          put_change(changeset, :password_hash, Bcrypt.hash_pwd_salt(pass))
+          put_change(changeset, :password, Bcrypt.hash_pwd_salt(pass))
       _ ->
           changeset
     end

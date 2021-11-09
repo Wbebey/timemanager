@@ -123,8 +123,8 @@ defmodule TimeManagerAPIWeb.UsersController do
     |> send_response(conn)
   end
 
-  def insert_user_in_db({:ok, {username, email}}, password, password_confirmation) do
-    to_insert = %{username: username, email: email, password: password, password_confirmation: password_confirmation}
+  def insert_user_in_db({:ok, {username, email}}, password_hash) do
+    to_insert = %{username: username, email: email, password_hash: password_hash}
     change_set = TimeManagerAPI.User.changeset(%TimeManagerAPI.User{}, to_insert)
 
     if !Enum.empty?(change_set.errors) do
@@ -137,14 +137,13 @@ defmodule TimeManagerAPIWeb.UsersController do
     end
   end
 
-  def insert_user_in_db({:error, message}, _, _) do
+  def insert_user_in_db({:error, message}, _) do
     {:error, message}
   end
 
-  def create(conn, %{"email" => email, "username" => username, "password" => password, "password_confirmation" => password_confirmation} = _) do
+  def create(conn, %{"email" => email, "username" => username, "password_hash" => password_hash} = _) do
     query_user_for_duplicates(username, email)
-    # |> salt_password(password)
-    |> insert_user_in_db(password, password_confirmation)
+    |> insert_user_in_db(password_hash)
     |> render_json()
     |> send_response(conn)
   end
