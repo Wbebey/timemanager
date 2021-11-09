@@ -36,3 +36,6 @@ npm-debug.log
 .env
 *.env
 .env*
+
+docker-compose.yml
+>>>>>>> feature(auth): add password hash field || But it's not working yet

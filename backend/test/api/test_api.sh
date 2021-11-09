@@ -25,7 +25,7 @@ checkNewMan() {
 }
 
 runNewman() {
-    newman run ./piscine_msc_pro_phoenix.postman_collection.json --timeout 1800000 --timeout-request 1800000 --timeout-script 1800000 --bail
+    newman run ./piscine_msc_pro_phoenix.postman_collection_2.json --timeout 1800000 --timeout-request 1800000 --timeout-script 1800000 --bail
     status=$?
     exit $status
 }
