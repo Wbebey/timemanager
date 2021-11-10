@@ -24,9 +24,17 @@ const store = new Vuex.Store({
         setRole(state, role) {
             state.user.role = role
         },
-        getAll (state) {
-            console.log(state.user)
+        getAll(state) {
+            console.log(state.user.role)
         },
+    },
+    getters: {
+        getRole: state => {
+            return state.user.role
+        },
+        getUsername: state => {
+            return state.user.username
+        }
     }
 })
 

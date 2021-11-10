@@ -17,7 +17,13 @@
             label="Nom d'utilisateur"
             required
           ></v-text-field>
-
+          <v-text-field
+            class="text-field"
+            v-model="email"
+            :rules="emailRules"
+            label="Adresse mail"
+            required
+          ></v-text-field>
           <v-text-field
             :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
             :type="show ? 'text' : 'password'"
@@ -56,7 +62,7 @@
 </template>
 
 <script>
-//import axios from "axios";
+import axios from "axios";
 import background from "../assets/background.jpg";
 import logo from "../assets/logo.png";
 import store from "../store";
@@ -72,7 +78,9 @@ export default {
       username: "",
       usernameRules: [
         (v) => !!v || "Le nom d'utilisateur est requis",
-        (v) => (v && v.length >= 3) || "Le nom d'utilisateur doit être supérieur à 3 characters",
+        (v) =>
+          (v && v.length >= 3) ||
+          "Le nom d'utilisateur doit être supérieur à 3 characters",
       ],
       email: "",
       emailRules: [
@@ -83,26 +91,27 @@ export default {
       passwordRules: [
         (v) => !!v || "Le mot de passe est requis",
         (v) =>
-          (v && v.length >= 8) || "Le mot de passe doit être supérieur à 8 characters",
+          (v && v.length >= 8) ||
+          "Le mot de passe doit être supérieur à 8 characters",
       ],
       checkbox: false,
     };
   },
   methods: {
     GetUser() {
-      //axios
-      //  .post("http://localhost:4000/api/users/", {
-      //    email: this.email,
-      //    username: this.username,
-      //  })
-      //  .then((response) => {
-      //    console.log(response.data);
-          store.commit('setId', 1);
-          this.$router.push("/user/" + "1");
-      //  })
-      //  .catch((error) => {
-      //    console.log("Error", error.message);
-      //  });
+      axios
+        .get(`http://localhost:4000/api/users/${7}`)
+        .then((response) => {
+          console.log(response.data);
+          store.commit("setId", response.data.id);
+          store.commit("setUsername", response.data.username);
+          store.commit("setEmail", response.data.email);
+          store.commit("setRole", response.data.role);
+          this.$router.push("/user/" + response.data.id);
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
+        });
     },
     validate() {
       //this.$refs.form.validate();
@@ -123,20 +132,21 @@ export default {
 
 <style>
 .v-application .text-button {
-    font-size: 1em !important;
-    font-weight: 500;
-    line-height: 2.25rem;
-    letter-spacing: 0.0892857143em !important;
-    font-family: "Roboto", sans-serif !important;
-    text-transform: uppercase !important;
+  font-size: 1em !important;
+  font-weight: 500;
+  line-height: 2.25rem;
+  letter-spacing: 0.0892857143em !important;
+  font-family: "Roboto", sans-serif !important;
+  text-transform: uppercase !important;
 }
 .theme--light.v-label {
   color: white !important;
   font-size: 1.5em;
 }
 
-.theme--light.v-input input, .theme--light.v-input textarea {
-    color: white !important;;
+.theme--light.v-input input,
+.theme--light.v-input textarea {
+  color: white !important;
 }
 
 .theme--light.v-text-field > .v-input__control > .v-input__slot:before {
@@ -251,5 +261,4 @@ export default {
 .logo {
   border-radius: 90%;
 }
-
 </style>

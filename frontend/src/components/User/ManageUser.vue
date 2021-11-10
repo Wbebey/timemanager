@@ -6,17 +6,98 @@
           <th class="text-left">Nom d’utilisateur</th>
           <th class="text-left">E-mail</th>
           <th class="text-left">Droits</th>
-          <th class="text-left">Manager assigné</th>
+          <th class="text-left">Teams assigné</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="store_role == 'root'">
         <tr v-for="user in orderedUsers" :key="user.id">
-          <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td>{{ user.userManager }}</td>
+          <td>
+            <v-btn
+              class="my-2"
+              color="orange"
+              outlined
+              fab
+              small
+              @click="
+                ConfirmationWindowCalendar = true;
+                userID = user.id;
+                username = user.username;
+              "
+            >
+              <v-icon>mdi-calendar-month</v-icon>
+            </v-btn>
 
+            <v-dialog
+              v-model="ConfirmationWindowCalendar"
+              max-width="350"
+              persistent
+              :retain-focus="false"
+            >
+              <v-card class="blue-grey darken-2">
+                <v-card-title class="text-h5">
+                  Information de l'utilisateur {{ username }}</v-card-title
+                >
+                <v-card-body>
+                  <div class="mx-5">
+                    <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-text-field
+                        v-model="username"
+                        :counter="10"
+                        :rules="usernameRules"
+                        label="Username"
+                        required
+                      />
+
+                      <v-text-field
+                        v-model="email"
+                        :rules="emailRules"
+                        label="E-mail"
+                        required
+                      />
+
+                      <v-select
+                        class="blue-grey darken-2"
+                        v-model="role"
+                        :items="rolePanel"
+                        :rules="[(v) => !!v || 'Select permissions']"
+                        label="Permissions"
+                        outlined
+                      />
+                    </v-form>
+                  </div>
+                </v-card-body>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="grey"
+                    @click="ConfirmationWindowCalendar = false"
+                  >
+                    Annuler
+                  </v-btn>
+
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="green"
+                    @click="
+                      updateUser(userID);
+                      promoteUser(userID);
+                      ConfirmationWindowCalendar = false;
+                    "
+                  >
+                    Modifier
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </td>
           <td>
             <v-btn
               class="my-2"
@@ -25,7 +106,7 @@
               fab
               small
               @click="
-                EditWindow = true;
+                ConfirmationWindowEdit = true;
                 userID = user.id;
                 username = user.username;
                 email = user.email;
@@ -36,7 +117,7 @@
             </v-btn>
 
             <v-dialog
-              v-model="EditWindow"
+              v-model="ConfirmationWindowEdit"
               max-width="350"
               persistent
               :retain-focus="false"
@@ -82,7 +163,7 @@
                     class="mb-3"
                     depressed
                     color="grey"
-                    @click="EditWindow = false"
+                    @click="ConfirmationWindowEdit = false"
                   >
                     Annuler
                   </v-btn>
@@ -94,7 +175,7 @@
                     @click="
                       updateUser(userID);
                       promoteUser(userID);
-                      EditWindow = false;
+                      ConfirmationWindowEdit = false;
                     "
                   >
                     Modifier
@@ -112,7 +193,7 @@
               fab
               small
               @click="
-                ConfirmationWindow = true;
+                ConfirmationWindowDelete = true;
                 deleteID = user.id;
               "
             >
@@ -120,7 +201,7 @@
             </v-btn>
 
             <v-dialog
-              v-model="ConfirmationWindow"
+              v-model="ConfirmationWindowDelete"
               max-width="350"
               persistent
               :retain-focus="false"
@@ -137,7 +218,7 @@
                     class="mb-3"
                     depressed
                     color="grey"
-                    @click="ConfirmationWindow = false"
+                    @click="ConfirmationWindowDelete = false"
                   >
                     Annuler
                   </v-btn>
@@ -148,7 +229,68 @@
                     color="red"
                     @click="
                       deleteUser();
-                      ConfirmationWindow = false;
+                      ConfirmationWindowDelete = false;
+                    "
+                  >
+                    Supprimer
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr v-for="user in orderedUsers" :key="user.id">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.userManager }}</td>
+          <td>
+            <v-btn
+              class="my-2"
+              color="orange"
+              outlined
+              fab
+              small
+              @click="
+                ConfirmationWindowCalendar = true;
+                deleteID = user.id;
+              "
+            >
+              <v-icon>mdi-calendar-month</v-icon>
+            </v-btn>
+
+            <v-dialog
+              v-model="ConfirmationWindowCalendar"
+              max-width="350"
+              persistent
+              :retain-focus="false"
+            >
+              <v-card class="blue-grey darken-2">
+                <v-card-title class="text-h5">
+                  Etes-vous sur(e) de vouloir supprimer cet utilisateur
+                  ?</v-card-title
+                >
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="grey"
+                    @click="ConfirmationWindowCalendar = false"
+                  >
+                    Annuler
+                  </v-btn>
+
+                  <v-btn
+                    class="mb-3"
+                    depressed
+                    color="red"
+                    @click="
+                      deleteUser();
+                      ConfirmationWindowCalendar = false;
                     "
                   >
                     Supprimer
@@ -165,8 +307,9 @@
 
 <script>
 import axios from "axios";
+import store from "../../store";
 
-var _ = require('lodash');
+var _ = require("lodash");
 
 export default {
   name: "ManageUser",
@@ -177,8 +320,10 @@ export default {
   },
   data() {
     return {
-      ConfirmationWindow: false,
-      EditWindow: false,
+      store_role: store.getters.getRole,
+      ConfirmationWindowDelete: false,
+      ConfirmationWindowCalendar: false,
+      ConfirmationWindowEdit: false,
 
       UserList: [],
       deleteID: null,

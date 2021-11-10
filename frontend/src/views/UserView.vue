@@ -3,14 +3,15 @@
     <div class="clock-side">
       <div class="header-clock-side">
         <img class="logo" :src="logo" />
-        <div class="title-user">Bienvenue Lucas Guyader</div>
+        <div class="title-user">Bienvenue {{store_username}}</div>
       </div>
       <div class="button-clock-side">
         <Button_Settings />
       </div>
-      <clock />
+      <clock v-if="store_role == 'employe' || store_role == 'manager'" />
       <div class="button-clock-second">
-        <Button_Employees />
+        <Button_Employees v-if="store_role == 'root' || store_role == 'manager'" />
+        <Button_Settings v-else />
         <v-btn
           class="button-employees"
           elevation="2"
@@ -24,10 +25,10 @@
     </div>
     <div class="calendar-side">
       <div class="header-calendar-size">
-          <v-btn icon @click="$refs.calendar.prev()">
-            <v-icon color="white">mdi-chevron-left</v-icon>
-          </v-btn>
-          <div class="v-select-calendar">
+        <v-btn icon @click="$refs.calendar.prev()">
+          <v-icon color="white">mdi-chevron-left</v-icon>
+        </v-btn>
+        <div class="v-select-calendar">
           <v-select
             v-model="type"
             :items="types"
@@ -37,10 +38,10 @@
             hide-details
             label="type"
           ></v-select>
-          </div>
-          <v-btn icon @click="$refs.calendar.next()">
-            <v-icon color="white">mdi-chevron-right</v-icon>
-          </v-btn>
+        </div>
+        <v-btn icon @click="$refs.calendar.next()">
+          <v-icon color="white">mdi-chevron-right</v-icon>
+        </v-btn>
       </div>
       <div class="calendar">
         <v-calendar
@@ -66,12 +67,14 @@ import logo from "../assets/logo.png";
 import Clock from "../components/ClockManager.vue";
 import Button_Employees from "../components/Button_Employees.vue";
 import Button_Settings from "../components/Button_Settings.vue";
-import store from "../store"
+import store from "../store";
 
 export default {
   name: "UserView",
   data() {
     return {
+      store_role: store.getters.getRole,
+      store_username: store.getters.getUsername,
       type: "month",
       types: ["month", "week"],
       weekday: [0, 1, 2, 3, 4, 5, 6],
@@ -114,6 +117,7 @@ export default {
   },
   mounted() {
     store.commit("getAll");
+    //console.log(process.env.BACKEND_URL)
   },
   methods: {
     deconnection() {
@@ -327,5 +331,4 @@ export default {
   color: white !important;
   font-weight: bold;
 }
-
 </style>
