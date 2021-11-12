@@ -78,15 +78,8 @@ export default {
     return {
       store_role: store.getters.getRole,
       store_username: store.getters.getUsername,
-      type: "month",
-      types: ["month", "week"],
-      weekday: [0, 1, 2, 3, 4, 5, 6],
-      weekdays: [
-        { text: "Sun - Sat", value: [0, 1, 2, 3, 4, 5, 6] },
-        { text: "Mon - Sun", value: [1, 2, 3, 4, 5, 6, 0] },
-        { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
-        { text: "Mon, Wed, Fri", value: [1, 3, 5] },
-      ],
+      type: "week",
+      types: ["week", "month"],
       value: "",
       events: [],
       colors: [
