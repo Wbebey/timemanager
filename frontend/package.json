@@ -18,7 +18,8 @@
     "portal-vue": "^2.1.7",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
-    "vuetify": "^2.4.0"
+    "vuetify": "^2.4.0",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.12.1",

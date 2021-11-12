@@ -3,14 +3,16 @@
     <div class="clock-side">
       <div class="header-clock-side">
         <img class="logo" :src="logo" />
-        <div class="title-user">Bienvenue {{store_username}}</div>
+        <div class="title-user">Bienvenue {{ store_username }}</div>
       </div>
       <div class="button-clock-side">
         <Button_Settings />
       </div>
       <clock v-if="store_role == 'employe' || store_role == 'manager'" />
       <div class="button-clock-second">
-        <Button_Employees v-if="store_role == 'root' || store_role == 'manager'" />
+        <Button_Employees
+          v-if="store_role == 'root' || store_role == 'manager'"
+        />
         <Button_Settings v-else />
         <v-btn
           class="button-employees"
@@ -63,6 +65,7 @@
 //import GetUser from "../components/User/GetUser.vue";
 //import ShowWorkingTimes from "../components/WorkingTime/ShowWorkingTime.vue";
 //import Clock from "../components/ClockManager.vue";
+import axios from "axios";
 import logo from "../assets/logo.png";
 import Clock from "../components/ClockManager.vue";
 import Button_Employees from "../components/Button_Employees.vue";
@@ -95,16 +98,6 @@ export default {
         "orange",
         "grey darken-1",
       ],
-      names: [
-        "Meeting",
-        "Holiday",
-        "PTO",
-        "Travel",
-        "Event",
-        "Birthday",
-        "Conference",
-        "Party",
-      ],
       logo,
       userId: this.$route.params.userId,
     };
@@ -114,10 +107,6 @@ export default {
     Button_Employees,
     Button_Settings,
     //ShowWorkingTimes,
-  },
-  mounted() {
-    store.commit("getAll");
-    //console.log(process.env.BACKEND_URL)
   },
   methods: {
     deconnection() {
@@ -134,31 +123,36 @@ export default {
       //    console.log("Error", error.message);
       //  });
     },
-    getEvents({ start, end }) {
-      const events = [];
+    getEvents() {
+      axios
+        .get(
+          "http://localhost:4000/api/workingtimes/" +
+            this.userId +
+            "?start=2000-01-01 00:00:00&end=2099-12-31 23:59:59"
+        )
+        .then((response) => {
+          const events = [];
+            console.log(response.data)
 
-      const min = new Date(`${start.date}T00:00:00`);
-      const max = new Date(`${end.date}T23:59:59`);
-      const days = (max.getTime() - min.getTime()) / 86400000;
-      const eventCount = this.rnd(days, days + 20);
+          for (var element in response.data) {
+            console.log(response.data[element])
+            const first = new Date(response.data[element].start);
+            const second = new Date(response.data[element].end);
 
-      for (let i = 0; i < eventCount; i++) {
-        const allDay = this.rnd(0, 3) === 0;
-        const firstTimestamp = this.rnd(min.getTime(), max.getTime());
-        const first = new Date(firstTimestamp - (firstTimestamp % 900000));
-        const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000;
-        const second = new Date(first.getTime() + secondTimestamp);
+            events.push({
+              name: "WorkingTime",
+              start: first,
+              end: second,
+              color: this.colors[this.rnd(0, this.colors.length - 1)],
+              timed: true,
+            });
+          }
 
-        events.push({
-          name: this.names[this.rnd(0, this.names.length - 1)],
-          start: first,
-          end: second,
-          color: this.colors[this.rnd(0, this.colors.length - 1)],
-          timed: !allDay,
+          this.events = events;
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
         });
-      }
-
-      this.events = events;
     },
     getEventColor(event) {
       return event.color;
@@ -166,6 +160,10 @@ export default {
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a;
     },
+  },
+  mounted() {
+    store.commit("getAll");
+    //console.log(process.env.BACKEND_URL)
   },
 };
 </script>
