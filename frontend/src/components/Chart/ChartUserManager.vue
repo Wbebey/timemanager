@@ -19,11 +19,10 @@ import moment from "moment";
 
 export default {
   name: "ChartUserManager",
+  props: ['id_user'],
   data() {
     return {
-      store_id: store.state.user.id,
       store_workingTimes: store.state.user.workingTimes,
-      store_hours: store.state.user.hours,
       start: "2000-01-01 00:00:00",
       end: "2099-12-31 23:59:59",
       chartOptions: {
@@ -54,9 +53,11 @@ export default {
     getWorkingTimeUser() {
       var newhours = [0, 0, 0, 0, 0, 0, 0];
       var days_counter = [0, 0, 0, 0, 0, 0, 0];
+      console.log("here");
+      console.log(this.id_user);
       axios
         .get(
-          `http://localhost:4000/api/workingtimes/${store.state.user.id}?start=2000-01-01 00:00:00&end=2099-12-31 23:59:59`
+          `http://localhost:4000/api/workingtimes/${this.id_user}?start=2000-01-01 00:00:00&end=2099-12-31 23:59:59`
         )
         .then((response) => {
           store.commit("setWorkingTimes", response.data);

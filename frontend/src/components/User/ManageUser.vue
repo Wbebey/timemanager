@@ -33,7 +33,7 @@
 
             <v-dialog
               v-model="ConfirmationWindowCalendar"
-              max-width="350"
+              width="70%"
               persistent
               :retain-focus="false"
             >
@@ -41,36 +41,9 @@
                 <v-card-title class="text-h5">
                   Information de l'utilisateur {{ username }}</v-card-title
                 >
-                <v-card-body>
-                  <div class="mx-5">
-                    <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-text-field
-                        v-model="username"
-                        :counter="10"
-                        :rules="usernameRules"
-                        label="Username"
-                        required
-                      />
-
-                      <v-text-field
-                        v-model="email"
-                        :rules="emailRules"
-                        label="E-mail"
-                        required
-                      />
-
-                      <v-select
-                        class="blue-grey darken-2"
-                        v-model="role"
-                        :items="rolePanel"
-                        :rules="[(v) => !!v || 'Select permissions']"
-                        label="Permissions"
-                        outlined
-                      />
-                    </v-form>
-                  </div>
-                </v-card-body>
-
+                <v-card-text>
+                  <ChartUserManager :id_user="userID" />
+                </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn
@@ -79,20 +52,7 @@
                     color="grey"
                     @click="ConfirmationWindowCalendar = false"
                   >
-                    Annuler
-                  </v-btn>
-
-                  <v-btn
-                    class="mb-3"
-                    depressed
-                    color="green"
-                    @click="
-                      updateUser(userID);
-                      promoteUser(userID);
-                      ConfirmationWindowCalendar = false;
-                    "
-                  >
-                    Modifier
+                    Retour
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -253,10 +213,7 @@
               outlined
               fab
               small
-              @click="
-                ConfirmationWindowCalendar = true;
-                deleteID = user.id;
-              "
+              @click="ConfirmationWindowCalendar = true"
             >
               <v-icon>mdi-calendar-month</v-icon>
             </v-btn>
@@ -308,11 +265,15 @@
 <script>
 import axios from "axios";
 import store from "../../store";
+import ChartUserManager from "../Chart/ChartUserManager.vue";
 
 var _ = require("lodash");
 
 export default {
   name: "ManageUser",
+  components: {
+    ChartUserManager,
+  },
   computed: {
     orderedUsers: function () {
       return _.orderBy(this.UserList, "id");

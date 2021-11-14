@@ -4,7 +4,7 @@
       Dashboard de l'utilisateur {{ store_username }}</v-card-title
     >
     <v-card-text>
-      <chart-usermanager />
+      <chart-usermanager :id_user="store_id"/>
     </v-card-text>
   </v-card>
 </template>
