@@ -24,28 +24,6 @@
             label="Adresse mail"
             required
           ></v-text-field>
-          <v-text-field
-            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show ? 'text' : 'password'"
-            color="white"
-            class="text-field"
-            v-model="password"
-            :rules="passwordRules"
-            label="Mot de passe"
-            required
-            @click:append="show = !show"
-          ></v-text-field>
-          <v-text-field
-            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show ? 'text' : 'password'"
-            color="white"
-            class="text-field"
-            v-model="passwordConfirm"
-            :rules="passwordRules"
-            label="Confirmer le mot de passe"
-            required
-            @click:append="show = !show"
-          ></v-text-field>
         </v-form>
         <v-btn
           class="button-field"
@@ -63,7 +41,7 @@
 </template>
 
 <script>
-//import axios from "axios";
+import axios from "axios";
 import background from "../assets/background.jpg";
 import logo from "../assets/logo.png";
 
@@ -100,22 +78,22 @@ export default {
   },
   methods: {
     createUser() {
-      //axios
-      //  .post("http://localhost:4000/api/users/", {
-      //    email: this.email,
-      //    username: this.username,
-      //  })
-      //  .then((response) => {
-      //    console.log(response.data);
-      this.$router.push("/user/" + "1");
-      //  })
-      //  .catch((error) => {
-      //    console.log("Error", error.message);
-      //  });
+      axios
+        .post("http://localhost:4000/api/users/", {
+          email: this.email,
+          username: this.username,
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.$router.push("/user/" + "1");
+        })
+        .catch((error) => {
+          console.log("Error", error.message);
+        });
     },
     validate() {
-      //this.$refs.form.validate();
-      if (this.password == this.passwordConfirm) this.createUser();
+      this.$refs.form.validate();
+      this.createUser();
     },
     reset() {
       this.$refs.form.reset();

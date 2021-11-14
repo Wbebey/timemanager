@@ -154,10 +154,8 @@ export default {
     deleteUser() {
       axios
         .delete("http://localhost:4000/api/users/" + this.deleteID)
-        .then((response) => {
-          console.log(this.deleteID);
-          console.log(response.data);
-          this.getUser();
+        .then(() => {
+          this.$router.push("/");
         })
         .catch((error) => {
           console.log("Error", error.message);

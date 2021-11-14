@@ -24,17 +24,6 @@
             label="Adresse mail"
             required
           ></v-text-field>
-          <v-text-field
-            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show ? 'text' : 'password'"
-            color="white"
-            class="text-field"
-            v-model="password"
-            :rules="passwordRules"
-            label="Mot de passe"
-            required
-            @click:append="show = !show"
-          ></v-text-field>
         </v-form>
         <v-btn
           class="button-field"
@@ -87,34 +76,38 @@ export default {
         (v) => !!v || "L'email est requis",
         (v) => /.+@.+\..+/.test(v) || "L'email doit être valide",
       ],
-      password: "",
-      passwordRules: [
-        (v) => !!v || "Le mot de passe est requis",
-        (v) =>
-          (v && v.length >= 8) ||
-          "Le mot de passe doit être supérieur à 8 characters",
-      ],
       checkbox: false,
     };
   },
   methods: {
     GetUser() {
       axios
-        .get(`http://localhost:4000/api/users/${7}`)
+        .get(
+          `http://localhost:4000/api/users?username=${this.username}&email=${this.email}`
+        )
         .then((response) => {
-          console.log(response.data);
-          store.state.user.id = response.data.id;
-          store.state.user.username = response.data.username;
-          store.state.user.email = response.data.email;
-          store.state.user.role = response.data.role;
-          this.$router.push("/user/" + response.data.id);
+          response.data.forEach((element) => {
+            if (
+              element.username == this.username &&
+              element.email == this.email
+            ) {
+              console.log(element.username, this.username)
+              console.log(element.email, this.email)
+              store.state.user.id = element.id;
+              store.state.user.username = element.username;
+              store.state.user.email = element.email;
+              store.state.user.role = element.role;
+            }
+          });
+          if (store.state.user.id != undefined)
+            this.$router.push("/user/" + store.state.user.id);
         })
         .catch((error) => {
           console.log("Error", error.message);
         });
     },
     validate() {
-      //this.$refs.form.validate();
+      this.$refs.form.validate();
       this.GetUser();
     },
     reset() {

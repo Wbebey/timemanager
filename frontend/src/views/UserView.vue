@@ -13,6 +13,7 @@
         <Button_Employees
           v-if="store_role == 'root' || store_role == 'manager'"
         />
+        <Button_Dashboard v-else />
         <v-btn
           class="button-employees"
           elevation="2"
@@ -60,14 +61,13 @@
 </template>
 
 <script>
-//import GetUser from "../components/User/GetUser.vue";
-//import ShowWorkingTimes from "../components/WorkingTime/ShowWorkingTime.vue";
-//import Clock from "../components/ClockManager.vue";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import Clock from "../components/ClockManager.vue";
 import Button_Employees from "../components/Button_Employees.vue";
 import Button_Settings from "../components/Button_Settings.vue";
+import Button_Dashboard from "../components/Button_Dashboard.vue";
+
 import store from "../store";
 
 export default {
@@ -97,22 +97,15 @@ export default {
     Clock,
     Button_Employees,
     Button_Settings,
-    //ShowWorkingTimes,
+    Button_Dashboard,
   },
   methods: {
     deconnection() {
-      //axios
-      //  .post("http://localhost:4000/api/users/", {
-      //    email: this.email,
-      //    username: this.username,
-      //  })
-      //  .then((response) => {
-      //    console.log(response.data);
+      store.state.user.id = undefined;
+      store.state.user.username = undefined;
+      store.state.user.email = undefined;
+      store.state.user.role = undefined;
       this.$router.push("/");
-      //  })
-      //  .catch((error) => {
-      //    console.log("Error", error.message);
-      //  });
     },
     getEvents() {
       axios
@@ -123,10 +116,10 @@ export default {
         )
         .then((response) => {
           const events = [];
-            console.log(response.data)
+          console.log(response.data);
 
           for (var element in response.data) {
-            console.log(response.data[element])
+            console.log(response.data[element]);
             const first = new Date(response.data[element].start);
             const second = new Date(response.data[element].end);
 
@@ -151,9 +144,6 @@ export default {
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a;
     },
-  },
-  mounted() {
-    //console.log(process.env.BACKEND_URL)
   },
 };
 </script>
@@ -239,11 +229,13 @@ export default {
 
 .logo {
   border-radius: 90%;
-  height: 15vh;
+  height: 10vh;
+  margin-left: 3vw;
 }
 
 .title-user {
-  font-size: 1.5em;
+  font-size: 1em;
+  margin-left: 1vw;
 }
 
 .header-clock-side {
@@ -254,7 +246,7 @@ export default {
   justify-items: center;
   flex-direction: row;
   font-weight: bold;
-  justify-content: center;
+  justify-content: start;
 }
 
 .button-clock-side {
