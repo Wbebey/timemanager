@@ -89,6 +89,7 @@
 
 <script>
 import axios from "axios";
+import store from "../../store";
 
 export default {
   name: "UpdateUser",
@@ -124,7 +125,6 @@ export default {
       axios
         .get(`http://localhost:4000/api/users/${this.userID}`)
         .then((response) => {
-          console.log(response.data);
           this.user = response.data;
         })
         .catch((error) => {
@@ -142,8 +142,10 @@ export default {
           username: this.user.username,
         })
         .then((response) => {
+          console.log("Update");
           console.log(response.data);
-          this.getUser();
+          this.user = response.data;
+          store.state.user.username = this.user.username;
         })
         .catch((error) => {
           console.log("Error", error.message);

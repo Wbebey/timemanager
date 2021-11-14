@@ -320,7 +320,7 @@ export default {
   },
   data() {
     return {
-      store_role: store.getters.getRole,
+      store_role: store.state.user.role,
       ConfirmationWindowDelete: false,
       ConfirmationWindowCalendar: false,
       ConfirmationWindowEdit: false,
@@ -379,7 +379,6 @@ export default {
           .put(`http://localhost:4000/api/users/${userID}/promote/${this.role}`)
           .then((response) => {
             console.log(response.data);
-            console.log(this.role);
             this.getUser();
           })
           .catch((error) => {

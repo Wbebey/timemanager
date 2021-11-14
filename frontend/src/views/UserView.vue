@@ -13,7 +13,6 @@
         <Button_Employees
           v-if="store_role == 'root' || store_role == 'manager'"
         />
-        <Button_Settings v-else />
         <v-btn
           class="button-employees"
           elevation="2"
@@ -49,7 +48,6 @@
         <v-calendar
           ref="calendar"
           v-model="value"
-          :weekdays="weekday"
           :type="type"
           :events="events"
           :event-overlap-threshold="30"
@@ -76,8 +74,8 @@ export default {
   name: "UserView",
   data() {
     return {
-      store_role: store.getters.getRole,
-      store_username: store.getters.getUsername,
+      store_role: store.state.user.role,
+      store_username: store.state.user.username,
       type: "week",
       types: ["week", "month"],
       value: "",
@@ -136,7 +134,7 @@ export default {
               name: "WorkingTime",
               start: first,
               end: second,
-              color: this.colors[this.rnd(0, this.colors.length - 1)],
+              color: "green",
               timed: true,
             });
           }
@@ -155,7 +153,6 @@ export default {
     },
   },
   mounted() {
-    store.commit("getAll");
     //console.log(process.env.BACKEND_URL)
   },
 };

@@ -9,7 +9,10 @@ const store = new Vuex.Store({
             username: null,
             email: null,
             role: null,
-        }]
+            workingTimes: [],
+            chartUserManager_series: [],
+            hours: null,
+        }],
     },
     mutations: {
         setId(state, id) {
@@ -24,18 +27,16 @@ const store = new Vuex.Store({
         setRole(state, role) {
             state.user.role = role
         },
-        getAll(state) {
-            console.log(state.user.role)
+        setWorkingTimes(state, workingTimes) {
+            state.user.workingTimes = workingTimes
         },
-    },
-    getters: {
-        getRole: state => {
-            return state.user.role
+        setHours(state, duration) {
+            state.user.hours = duration
         },
-        getUsername: state => {
-            return state.user.username
+        setChartUserManager_series(state, series) {
+            state.user.chartUserManager_series = series
         }
-    }
+    },
 })
 
 export default store;

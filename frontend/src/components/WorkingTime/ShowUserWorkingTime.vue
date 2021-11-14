@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       info: null,
-      id: 3,
+      id: 7,
       start: "2000-01-01 00:00:00",
       end: "2099-12-31 23:59:59",
     };
@@ -49,29 +49,11 @@ export default {
           });
           this.info = 1;
         });
-      /*.catch((error) => {
-          console.log("Error", error.message);
-          this.info = null;
-        });
-        */
     },
   },
 };
 </script>
 
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<style>
+
 </style>

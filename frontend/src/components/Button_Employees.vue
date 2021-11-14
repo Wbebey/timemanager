@@ -40,16 +40,5 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.create-user {
-  width: 70%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.modif-user {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+
 </style>

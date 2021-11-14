@@ -103,10 +103,10 @@ export default {
         .get(`http://localhost:4000/api/users/${7}`)
         .then((response) => {
           console.log(response.data);
-          store.commit("setId", response.data.id);
-          store.commit("setUsername", response.data.username);
-          store.commit("setEmail", response.data.email);
-          store.commit("setRole", response.data.role);
+          store.state.user.id = response.data.id;
+          store.state.user.username = response.data.username;
+          store.state.user.email = response.data.email;
+          store.state.user.role = response.data.role;
           this.$router.push("/user/" + response.data.id);
         })
         .catch((error) => {
