@@ -53,8 +53,6 @@ export default {
     getWorkingTimeUser() {
       var newhours = [0, 0, 0, 0, 0, 0, 0];
       var days_counter = [0, 0, 0, 0, 0, 0, 0];
-      console.log("here");
-      console.log(this.id_user);
       axios
         .get(
           `http://localhost:4000/api/workingtimes/${this.id_user}?start=2000-01-01 00:00:00&end=2099-12-31 23:59:59`

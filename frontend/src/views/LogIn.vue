@@ -91,8 +91,6 @@ export default {
               element.username == this.username &&
               element.email == this.email
             ) {
-              console.log(element.username, this.username)
-              console.log(element.email, this.email)
               store.state.user.id = element.id;
               store.state.user.username = element.username;
               store.state.user.email = element.email;

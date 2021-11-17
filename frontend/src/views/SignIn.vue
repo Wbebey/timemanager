@@ -44,6 +44,7 @@
 import axios from "axios";
 import background from "../assets/background.jpg";
 import logo from "../assets/logo.png";
+import store from "../store";
 
 export default {
   name: "SignIn",
@@ -57,8 +58,8 @@ export default {
       usernameRules: [
         (v) => !!v || "Le nom d'utilisateur est requis",
         (v) =>
-          (v && v.length >= 3) ||
-          "Le nom d'utilisateur doit être supérieur à 3 characters",
+          (v && v.length >= 5) ||
+          "Le nom d'utilisateur doit être supérieur à 5 characters",
       ],
       email: "",
       emailRules: [
@@ -84,8 +85,11 @@ export default {
           username: this.username,
         })
         .then((response) => {
-          console.log(response.data);
-          this.$router.push("/user/" + "1");
+          store.state.user.id = response.data.id;
+          store.state.user.username = response.data.username;
+          store.state.user.email = response.data.email;
+          store.state.user.role = response.data.role;
+          this.$router.push("/user/" + response.data.id);
         })
         .catch((error) => {
           console.log("Error", error.message);

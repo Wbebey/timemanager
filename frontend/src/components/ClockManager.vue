@@ -73,7 +73,6 @@ export default {
       axios
         .get("http://localhost:4000/api/clocks/" + this.userID)
         .then((response) => {
-          console.log(response.data);
           this.startDateTime = response.data.time;
           this.clockIn = response.data.status;
         })
@@ -86,7 +85,6 @@ export default {
       axios
         .post("http://localhost:4000/api/clocks/" + this.userID)
         .then((response) => {
-          console.log(response.data);
           if (response.data == "First clock initialised") this.createClock();
           else this.getClock();
         })

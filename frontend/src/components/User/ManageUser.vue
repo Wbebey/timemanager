@@ -313,7 +313,6 @@ export default {
       axios
         .get("http://localhost:4000/api/users")
         .then((response) => {
-          console.log(response.data);
           this.UserList = response.data;
         })
         .catch((error) => {
@@ -326,8 +325,7 @@ export default {
           email: this.email,
           username: this.username,
         })
-        .then((response) => {
-          console.log(response.data);
+        .then(() => {
           this.getUser();
         })
         .catch((error) => {
@@ -338,8 +336,7 @@ export default {
       if (this.role != null) {
         axios
           .put(`http://localhost:4000/api/users/${userID}/promote/${this.role}`)
-          .then((response) => {
-            console.log(response.data);
+          .then(() => {
             this.getUser();
           })
           .catch((error) => {
@@ -351,18 +348,13 @@ export default {
     deleteUser() {
       axios
         .delete("http://localhost:4000/api/users/" + this.deleteID)
-        .then((response) => {
-          console.log(this.deleteID);
-          console.log(response.data);
+        .then(() => {
           this.getUser();
         })
         .catch((error) => {
           console.log("Error", error.message);
           this.info = null;
         });
-    },
-    test() {
-      console.log(this.deleteID);
     },
   },
 };

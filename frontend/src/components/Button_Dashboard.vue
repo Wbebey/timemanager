@@ -54,7 +54,6 @@ export default {
             hours.push(duration.asHours());
           });
           store.commit("setHours", hours);
-          console.log("component Button Dashboard");
           console.log(store.state.user.hours);
         })
         .catch((error) => {
