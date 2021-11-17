@@ -1,20 +1,16 @@
 <template>
   <div>
-    <p>WorkingTime View !</p>
-    <working-times />
-    <clock />
+    <teams-manager />
   </div>
 </template>
 
 <script>
-import WorkingTimes from "../components/WorkingTimes.vue";
-import Clock from "../components/ClockManager.vue";
+import TeamsManager from '../components/TeamsManager.vue';
 
 export default {
   name: "WorkingTimesView",
   components: {
-    Clock,
-    WorkingTimes,
+    TeamsManager,
   },
 };
 </script>
