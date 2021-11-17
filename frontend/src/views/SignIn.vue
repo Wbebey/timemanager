@@ -89,7 +89,8 @@ export default {
           store.state.user.username = response.data.username;
           store.state.user.email = response.data.email;
           store.state.user.role = response.data.role;
-          this.$router.push("/user/" + response.data.id);
+          if (store.state.user.id != undefined)
+            this.$router.push("/user/" + response.data.id);
         })
         .catch((error) => {
           console.log("Error", error.message);
