@@ -31,7 +31,7 @@ spec:
                   name: backend-config
                   key: backend_port
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: Always
 ---
 apiVersion: v1 # Service
@@ -41,10 +41,10 @@ metadata:
   namespace: timemanager-25-prod
 spec:
   type: LoadBalancer
-  loadBalancerIP: 34.140.100.13
+  # loadBalancerIP: 34.140.100.13
   selector:
     app: frontend-prod
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 80
+      targetPort: 80

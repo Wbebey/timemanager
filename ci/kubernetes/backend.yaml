@@ -57,10 +57,10 @@ metadata:
   namespace: timemanager-25-prod
 spec:
   type: LoadBalancer
-  loadBalancerIP: 34.140.100.13
+  # loadBalancerIP: 34.140.100.13
   selector:
     app: backend-prod
   ports:
     - protocol: TCP
-      port: 4000
+      port: 80
       targetPort: 4000
