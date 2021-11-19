@@ -69,7 +69,7 @@
       </template>
 
       <template v-slot:default="props">
-        <v-row>
+        <v-row class="menuTeam">
           <v-col
             v-for="item in props.items"
             :key="item.name"
@@ -397,4 +397,11 @@ export default {
 tr:hover td {
   background-color: #3e4c56;
 }
+
+@media screen and (min-width: 768px) {
+  .menuTeam{
+    height:90vh !important;
+  }
+}
+
 </style>

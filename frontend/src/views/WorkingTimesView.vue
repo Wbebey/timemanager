@@ -1,6 +1,6 @@
 <template>
   <div>
-    <teams-manager />
+    <teams-manager class="teamManager" />
   </div>
 </template>
 
@@ -30,4 +30,5 @@ li {
 a {
   color: #42b983;
 }
+
 </style>
